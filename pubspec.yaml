@@ -1,0 +1,45 @@
+name: wisdom_sutra
+description: UI-only mystical guidance app scaffold.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  provider: ^6.0.5
+  shared_preferences: ^2.2.2
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/questions_en.json
+    - assets/data/questions_gu.json
+    - assets/data/questions_hi.json
+    - assets/data/questions_mr.json
+    - assets/data/questions_bn.json
+    - assets/data/answers.json
+    - assets/images/
+  # NOTE: Font files are not added yet to keep this scaffold lightweight and compiling.
+  # To embed locally (preferred for production & offline):
+  # fonts:
+  #   - family: PlayfairDisplay
+  #     fonts:
+  #       - asset: assets/fonts/PlayfairDisplay-Regular.ttf
+  #       - asset: assets/fonts/PlayfairDisplay-SemiBold.ttf
+  #         weight: 600
+  #   - family: NotoSansGujarati
+  #     fonts:
+  #       - asset: assets/fonts/NotoSansGujarati-Regular.ttf
+  #       - asset: assets/fonts/NotoSansGujarati-Medium.ttf
+  #         weight: 500
+  # GoogleFonts package is used meanwhile. Place TTFs later and uncomment.

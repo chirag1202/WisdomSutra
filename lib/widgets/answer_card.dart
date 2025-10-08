@@ -21,12 +21,12 @@ class AnswerCard extends StatelessWidget {
                     .titleLarge!
                     .copyWith(color: AppColors.indigoDeep)),
             const SizedBox(height: 22),
-      if (pattern.isNotEmpty)
-        Text('Pattern: $pattern',
-          style: Theme.of(context)
-            .textTheme
-            .bodyMedium!
-            .copyWith(color: AppColors.indigoDeep.withOpacity(.7))),
+            if (pattern.isNotEmpty)
+              Text('Pattern: $pattern',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: AppColors.indigoDeep.withOpacity(.7))),
           ],
         ),
       ),

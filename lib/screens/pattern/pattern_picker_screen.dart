@@ -76,17 +76,17 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),
-                child: GoldenButton(
-                  label: 'Reveal Answer',
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    '/viewAnswer',
-                    arguments: {
-                      'pattern': patternKey,
-                      'string': patternString,
-                    },
-                  ),
+              child: GoldenButton(
+                label: 'Reveal Answer',
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  '/viewAnswer',
+                  arguments: {
+                    'pattern': patternKey,
+                    'string': patternString,
+                  },
                 ),
+              ),
             )
           ],
         ),

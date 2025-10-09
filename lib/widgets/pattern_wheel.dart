@@ -20,18 +20,39 @@ class PatternWheel extends StatefulWidget {
 
 class _PatternWheelState extends State<PatternWheel> {
   late FixedExtentScrollController _controller;
+  static const int kItems =
+      120; // sufficient for smooth flicking without overdraw
+  late final List<Widget> _items; // cache children to avoid rebuild cost
+  int _lastNotified = -1;
 
   @override
   void initState() {
     super.initState();
-    _controller = FixedExtentScrollController(initialItem: widget.value);
+    final initial = (widget.value.clamp(1, kItems)) - 1;
+    _controller = FixedExtentScrollController(initialItem: initial);
+    _items = List.generate(
+      kItems,
+      (i) => Center(
+        child: Text(
+          '${i + 1}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: AppColors.indigoDeep,
+            height: 1.1,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   void didUpdateWidget(covariant PatternWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value && _controller.hasClients) {
-      _controller.jumpToItem(widget.value);
+      final target = (widget.value.clamp(1, kItems)) - 1;
+      _controller.jumpToItem(target);
     }
   }
 
@@ -44,45 +65,45 @@ class _PatternWheelState extends State<PatternWheel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 68,
-      height: 180,
+      width: 72,
+      height: 200,
       decoration: BoxDecoration(
         color: AppColors.parchment,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withAlpha((255 * .35).round()),
-              blurRadius: 20,
-              offset: const Offset(0, 12)),
+              color: Colors.black.withAlpha((255 * .28).round()),
+              blurRadius: 24,
+              offset: const Offset(0, 14)),
           BoxShadow(
-              color: AppColors.gold.withAlpha((255 * .3).round()),
-              blurRadius: 12,
+              color: AppColors.gold.withAlpha((255 * .25).round()),
+              blurRadius: 16,
               spreadRadius: -4),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
         child: CupertinoPicker(
           scrollController: _controller,
-          itemExtent: 48,
+          itemExtent: 42,
           useMagnifier: true,
-          magnification: 1.18,
-          squeeze: 1.1,
+          magnification: 1.1,
+          squeeze: 1.0,
           diameterRatio: 1.2,
-          backgroundColor: Colors.transparent,
-          onSelectedItemChanged: (v) => widget.onChanged(widget.index, v),
-          children: List.generate(
-            15,
-            (i) => Center(
-              child: Text(
-                '$i',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .copyWith(color: AppColors.indigoDeep),
-              ),
-            ),
+          selectionOverlay: const CupertinoPickerDefaultSelectionOverlay(
+            background: Color(0x22000000),
           ),
+          // iOS-like gentle scroll physics; reduces jitter on low-end devices
+          looping: true,
+          backgroundColor: Colors.transparent,
+          onSelectedItemChanged: (v) {
+            final value = (v % kItems) + 1; // 1..120
+            if (value != _lastNotified) {
+              _lastNotified = value;
+              widget.onChanged(widget.index, value);
+            }
+          },
+          children: _items,
         ),
       ),
     );

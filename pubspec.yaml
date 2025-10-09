@@ -14,12 +14,39 @@ dependencies:
   shared_preferences: ^2.2.2
   google_fonts: ^6.2.1
   supabase_flutter: ^2.6.0
-  app_links: ^3.5.0
+  app_links: ^6.4.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.13.1
+
+dependency_overrides:
+  # Force modern plugin version compatible with Flutter's Gradle plugin loader
+  app_links: ^6.4.1
+
+flutter_native_splash:
+  color: "#1F1140" # deep indigo background
+  color_dark: "#0F0824"
+  image: assets/images/Logo.png.png
+  image_dark: assets/images/Logo.png.png
+  android: true
+  ios: true
+  android_12:
+    color: "#1F1140"
+    color_dark: "#0F0824"
+    image: assets/images/Logo.png.png
+    image_dark: assets/images/Logo.png.png
+  web: false
+
+# App launcher icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/Logo.png.png
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true
@@ -30,6 +57,7 @@ flutter:
     - assets/data/questions_mr.json
     - assets/data/questions_bn.json
     - assets/data/answers.json
+    - assets/images/Logo.png.png
     - assets/images/
   # NOTE: Font files are not added yet to keep this scaffold lightweight and compiling.
   # To embed locally (preferred for production & offline):

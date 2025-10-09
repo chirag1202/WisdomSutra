@@ -290,17 +290,17 @@ ThemeData buildAppTheme(ThemeVariant variant,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(20),
             borderSide:
                 BorderSide(color: ext.accent.withAlpha((255 * .4).round())),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(20),
             borderSide:
                 BorderSide(color: ext.accent.withAlpha((255 * .4).round())),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide(color: ext.accent, width: 1.4),
           ),
           hintStyle: bodyFont.copyWith(
@@ -311,11 +311,13 @@ ThemeData buildAppTheme(ThemeVariant variant,
           style: ElevatedButton.styleFrom(
             backgroundColor: ext.accent,
             foregroundColor: ext.textOnLight,
-            minimumSize: const Size.fromHeight(56),
+            minimumSize: const Size.fromHeight(58),
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
             textStyle:
                 headingFont.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
+            elevation: 8,
+            shadowColor: ext.accent.withOpacity(.35),
           ),
         ),
       )

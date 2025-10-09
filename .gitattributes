@@ -1,0 +1,15 @@
+* text=auto eol=lf
+
+# Ensure images/binaries aren’t normalized
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.jar binary
+*.keystore binary
+
+# Keep Gradle wrapper as-is
+gradlew text eol=lf
+gradlew.bat text eol=crlf

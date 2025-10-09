@@ -11,11 +11,13 @@ class ViewAnswerScreen extends StatefulWidget {
   final String pattern;
   final String patternDisplay;
   final int? questionId;
+  final String? questionText;
   const ViewAnswerScreen({
     super.key,
     required this.pattern,
     required this.patternDisplay,
     this.questionId,
+    this.questionText,
   });
 
   @override
@@ -54,6 +56,7 @@ class _ViewAnswerScreenState extends State<ViewAnswerScreen> {
     final app = context.watch<AppState>();
     final colors = Theme.of(context).extension<SutraColors>();
     final isFav = app.isFavorite(widget.pattern);
+    final displayName = (app.userName ?? '').trim();
 
     // Resolve answer text: DB > local > placeholder
     String resolvedText;
@@ -73,6 +76,7 @@ class _ViewAnswerScreenState extends State<ViewAnswerScreen> {
     return Scaffold(
       appBar: SutraAppBar(
         title: 'Answer',
+        showBack: false,
         actions: [
           Builder(builder: (context) {
             final ext = Theme.of(context).extension<SutraColors>();
@@ -108,9 +112,83 @@ class _ViewAnswerScreenState extends State<ViewAnswerScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: AnswerCard(
-              pattern: '', // pattern hidden
-              text: _loading ? 'Please wait…' : resolvedText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if ((widget.questionText ?? '').isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (colors?.surface ?? AppColors.parchment)
+                            .withOpacity(.96),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: (colors?.accent ?? AppColors.gold)
+                              .withOpacity(.75),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(.22),
+                            blurRadius: 22,
+                            offset: const Offset(0, 12),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.help_outline_rounded,
+                              color: colors?.accent ?? AppColors.gold),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              widget.questionText!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: colors?.textOnLight ??
+                                        AppColors.indigoDeep,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (displayName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'Dear $displayName,',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(color: colors?.textOnDark ?? Colors.white),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                if (!_loading && displayName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'The answer to your question is -',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: (colors?.textOnDark ?? Colors.white)
+                              .withOpacity(.9)),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                AnswerCard(
+                  pattern: '', // pattern hidden
+                  text: _loading ? 'Please wait…' : resolvedText,
+                ),
+              ],
             ),
           ),
         ),

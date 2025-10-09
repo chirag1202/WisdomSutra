@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/sutra_logo.dart';
 import '../../widgets/golden_button.dart';
 import '../../constants/colors.dart';
@@ -6,6 +7,7 @@ import '../../services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/sutra_app_bar.dart';
 import '../../constants/theme.dart';
+import '../../state/app_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,6 +47,27 @@ class _LoginScreenState extends State<LoginScreen> {
       final res = await _auth.signInWithPassword(email: email, password: pass);
       if (!mounted) return;
       if (res.session != null) {
+        // Derive a display name from user metadata or email prefix
+        final user = Supabase.instance.client.auth.currentUser;
+        String? name;
+        if (user != null) {
+          final Map<String, dynamic>? meta = user.userMetadata;
+          final rawName = meta?['name'];
+          if (rawName is String && rawName.trim().isNotEmpty) {
+            name = rawName.trim();
+          } else if ((user.email ?? '').contains('@')) {
+            name = user.email!.split('@').first;
+          }
+        } else if (email.contains('@')) {
+          name = email.split('@').first;
+        }
+        // Persist in AppState
+        try {
+          if (mounted) {
+            // ignore: use_build_context_synchronously
+            await context.read<AppState>().setUserName(name);
+          }
+        } catch (_) {}
         Navigator.pushReplacementNamed(context, '/questions');
       } else {
         _showError('Login failed.');
@@ -87,28 +110,27 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.extension<SutraColors>();
-    final textColor = colors?.textOnDark ?? AppColors.parchment;
-    final hintColor = textColor.withOpacity(0.65);
+    final textColor = colors?.textOnDark ?? Colors.white;
+    final hintColor = textColor.withOpacity(0.9);
     final accent = colors?.accent ?? AppColors.gold;
-    OutlineInputBorder _border(Color c) => OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: c, width: 1.2),
+    OutlineInputBorder border(Color c) => OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c, width: 1.4),
         );
     return Scaffold(
-      appBar: const SutraAppBar(title: 'Login', showHome: true),
+      appBar:
+          const SutraAppBar(title: 'Login', showHome: true, showLogout: false),
       body: Stack(
         children: [
           DecoratedBox(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.indigoDeep,
-                  Color(0xFF3A235C),
-                  AppColors.goldDark
+                  colors?.gradientStart ?? AppColors.indigoDeep,
+                  colors?.gradientEnd ?? AppColors.indigoDarker,
                 ],
-                stops: [0, .55, 1],
               ),
             ),
             child: SafeArea(
@@ -129,21 +151,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
-                      style:
-                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                       cursorColor: accent,
                       decoration: InputDecoration(
                         hintText: 'Email',
-                        hintStyle: theme.textTheme.bodyLarge
-                            ?.copyWith(color: hintColor),
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: hintColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                         errorText: _emailError,
-                        enabledBorder: _border(accent.withOpacity(.6)),
-                        focusedBorder: _border(accent),
-                        errorBorder: _border(Colors.redAccent),
-                        focusedErrorBorder: _border(Colors.redAccent),
+                        enabledBorder: border(accent.withOpacity(.85)),
+                        focusedBorder: border(accent),
+                        errorBorder: border(Colors.redAccent),
+                        focusedErrorBorder: border(Colors.redAccent),
                         filled: true,
                         fillColor: (colors?.surface ?? AppColors.parchment)
-                            .withOpacity(.08),
+                            .withOpacity(.18),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                       ),
@@ -152,21 +178,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       obscureText: true,
                       controller: _passCtrl,
-                      style:
-                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                       cursorColor: accent,
                       decoration: InputDecoration(
                         hintText: 'Password',
-                        hintStyle: theme.textTheme.bodyLarge
-                            ?.copyWith(color: hintColor),
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: hintColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                         suffixIcon: Icon(Icons.visibility, color: accent),
-                        enabledBorder: _border(accent.withOpacity(.6)),
-                        focusedBorder: _border(accent),
-                        errorBorder: _border(Colors.redAccent),
-                        focusedErrorBorder: _border(Colors.redAccent),
+                        enabledBorder: border(accent.withOpacity(.85)),
+                        focusedBorder: border(accent),
+                        errorBorder: border(Colors.redAccent),
+                        focusedErrorBorder: border(Colors.redAccent),
                         filled: true,
                         fillColor: (colors?.surface ?? AppColors.parchment)
-                            .withOpacity(.08),
+                            .withOpacity(.18),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                       ),

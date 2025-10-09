@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
+import '../constants/theme.dart';
 
 class GoldenButton extends StatelessWidget {
   final String label;
@@ -15,38 +16,41 @@ class GoldenButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ext = Theme.of(context).extension<SutraColors>();
+    final accent = ext?.accent ?? AppColors.gold;
+    final accentAlt = ext?.accentAlt ?? AppColors.goldDark;
     final child = Center(
       child: Text(
         label,
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: filled ? Colors.black : AppColors.gold,
+              color: filled ? (ext?.textOnLight ?? Colors.black) : accent,
               fontWeight: FontWeight.w600,
             ),
       ),
     );
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(40),
+      borderRadius: BorderRadius.circular(48),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         padding: padding,
         decoration: BoxDecoration(
           gradient: filled
-              ? const LinearGradient(
-                  colors: AppColors.gradientButton,
+              ? LinearGradient(
+                  colors: [accentAlt, accent],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter)
               : null,
           color: filled ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(40),
-          border: Border.all(color: AppColors.gold, width: filled ? 0 : 2),
+          borderRadius: BorderRadius.circular(48),
+          border: Border.all(color: accent, width: filled ? 0 : 2),
           boxShadow: filled
               ? [
                   BoxShadow(
-                    color: AppColors.gold.withAlpha((255 * .55).round()),
-                    blurRadius: 18,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 6),
+                    color: accent.withAlpha((255 * .45).round()),
+                    blurRadius: 24,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 10),
                   ),
                 ]
               : null,

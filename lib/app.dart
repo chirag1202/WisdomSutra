@@ -51,6 +51,7 @@ class WisdomSutraApp extends StatelessWidget {
           builder: (_) => ViewAnswerScreen(
               pattern: args['pattern'] ?? '1-2-2-1',
               patternDisplay: args['string'] ?? '1 • 2 • 2 • 1',
+              questionText: args['question'] as String?,
               questionId: args['questionId'] as int?),
         );
     }

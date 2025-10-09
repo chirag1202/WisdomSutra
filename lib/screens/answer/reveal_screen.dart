@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/colors.dart';
+import '../../constants/theme.dart';
 import '../../widgets/golden_button.dart';
 
 class RevealScreen extends StatelessWidget {
@@ -17,11 +18,13 @@ class RevealScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              colors: [AppColors.indigoDeep, AppColors.indigoDarker],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+            Theme.of(context).extension<SutraColors>()?.gradientStart ??
+                AppColors.indigoDeep,
+            Theme.of(context).extension<SutraColors>()?.gradientEnd ??
+                AppColors.indigoDarker
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
         ),
         child: Center(
           child: Padding(
@@ -38,6 +41,7 @@ class RevealScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/viewAnswer', arguments: {
                     'pattern': patternKey,
                     'string': patternString,
+                    // No question text available here
                   }),
                 )
               ],

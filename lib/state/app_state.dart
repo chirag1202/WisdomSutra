@@ -26,6 +26,7 @@ class AppState extends ChangeNotifier {
   Map<String, dynamic> _answers = {}; // pattern -> { 'en': 'text', ... }
   final Map<AppLanguage, List<QuestionItem>> _questions = {};
   bool _initialized = false;
+  String? _userName;
 
   // Random selections cache per language
   final Map<AppLanguage, List<QuestionItem>> _randomSelections = {};
@@ -36,6 +37,7 @@ class AppState extends ChangeNotifier {
 
   bool get initialized => _initialized;
   AppLanguage get language => _language;
+  String? get userName => _userName;
   // New typed getters including IDs
   List<QuestionItem> get questionsWithIds => _questions[_language] ?? const [];
   List<QuestionItem> get randomQuestionsWithIds =>
@@ -57,6 +59,7 @@ class AppState extends ChangeNotifier {
     final savedLang = prefs.getString('app_lang');
     final savedTheme = prefs.getString('theme_variant');
     final savedBrightness = prefs.getString('brightness_override');
+    _userName = prefs.getString('user_name');
     if (savedLang != null) {
       _language = AppLanguage.values.firstWhere(
         (e) => e.code == savedLang,
@@ -156,6 +159,17 @@ class AppState extends ChangeNotifier {
     _themeVariant = variant;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('theme_variant', variant.id);
+    notifyListeners();
+  }
+
+  Future<void> setUserName(String? name) async {
+    _userName = name;
+    final prefs = await SharedPreferences.getInstance();
+    if (name == null) {
+      await prefs.remove('user_name');
+    } else {
+      await prefs.setString('user_name', name);
+    }
     notifyListeners();
   }
 

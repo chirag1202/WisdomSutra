@@ -33,6 +33,33 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Flutter generated registrants (should not be committed)
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Flutter metadata
+.metadata
+
+# Gradle/Android caches and builds
+.gradle/
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+
+# iOS ephemeral/generated
+ios/Flutter/ephemeral/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# IDE/Editor
+*.iml
+.idea/
+.vscode/
+
+# Backup/temporary
+*.kts.bak
+
 # Symbolication related
 app.*.symbols
 

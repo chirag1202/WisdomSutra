@@ -73,28 +73,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.extension<SutraColors>();
-    final textColor = colors?.textOnDark ?? AppColors.parchment;
-    final hintColor = textColor.withOpacity(0.65);
+    final textColor = colors?.textOnDark ?? Colors.white;
+    final hintColor = textColor.withOpacity(0.9);
     final accent = colors?.accent ?? AppColors.gold;
-    OutlineInputBorder _border(Color c) => OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: c, width: 1.2),
+    OutlineInputBorder border(Color c) => OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c, width: 1.4),
         );
     return Scaffold(
-      appBar: const SutraAppBar(title: 'Sign Up', showHome: true),
+      appBar: const SutraAppBar(
+          title: 'Sign Up', showHome: true, showLogout: false),
       body: Stack(
         children: [
           DecoratedBox(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.indigoDeep,
-                  Color(0xFF3A235C),
-                  AppColors.goldDark
+                  colors?.gradientStart ?? AppColors.indigoDeep,
+                  colors?.gradientEnd ?? AppColors.indigoDarker,
                 ],
-                stops: [0, .55, 1],
               ),
             ),
             child: SafeArea(
@@ -116,21 +115,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
-                      style:
-                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                       cursorColor: accent,
                       decoration: InputDecoration(
                         hintText: 'Email',
-                        hintStyle: theme.textTheme.bodyLarge
-                            ?.copyWith(color: hintColor),
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: hintColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                         errorText: _emailError,
-                        enabledBorder: _border(accent.withOpacity(.6)),
-                        focusedBorder: _border(accent),
-                        errorBorder: _border(Colors.redAccent),
-                        focusedErrorBorder: _border(Colors.redAccent),
+                        enabledBorder: border(accent.withOpacity(.85)),
+                        focusedBorder: border(accent),
+                        errorBorder: border(Colors.redAccent),
+                        focusedErrorBorder: border(Colors.redAccent),
                         filled: true,
                         fillColor: (colors?.surface ?? AppColors.parchment)
-                            .withOpacity(.08),
+                            .withOpacity(.18),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                       ),
@@ -139,20 +142,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextField(
                       controller: _passCtrl,
                       obscureText: true,
-                      style:
-                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                       cursorColor: accent,
                       decoration: InputDecoration(
                         hintText: 'Password',
-                        hintStyle: theme.textTheme.bodyLarge
-                            ?.copyWith(color: hintColor),
-                        enabledBorder: _border(accent.withOpacity(.6)),
-                        focusedBorder: _border(accent),
-                        errorBorder: _border(Colors.redAccent),
-                        focusedErrorBorder: _border(Colors.redAccent),
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: hintColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        enabledBorder: border(accent.withOpacity(.85)),
+                        focusedBorder: border(accent),
+                        errorBorder: border(Colors.redAccent),
+                        focusedErrorBorder: border(Colors.redAccent),
                         filled: true,
                         fillColor: (colors?.surface ?? AppColors.parchment)
-                            .withOpacity(.08),
+                            .withOpacity(.18),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                       ),
@@ -161,21 +168,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextField(
                       controller: _confirmCtrl,
                       obscureText: true,
-                      style:
-                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                       cursorColor: accent,
                       decoration: InputDecoration(
                         hintText: 'Confirm Password',
-                        hintStyle: theme.textTheme.bodyLarge
-                            ?.copyWith(color: hintColor),
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: hintColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                         errorText: _confirmError,
-                        enabledBorder: _border(accent.withOpacity(.6)),
-                        focusedBorder: _border(accent),
-                        errorBorder: _border(Colors.redAccent),
-                        focusedErrorBorder: _border(Colors.redAccent),
+                        enabledBorder: border(accent.withOpacity(.85)),
+                        focusedBorder: border(accent),
+                        errorBorder: border(Colors.redAccent),
+                        focusedErrorBorder: border(Colors.redAccent),
                         filled: true,
                         fillColor: (colors?.surface ?? AppColors.parchment)
-                            .withOpacity(.08),
+                            .withOpacity(.18),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                       ),

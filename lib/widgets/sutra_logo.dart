@@ -11,10 +11,12 @@ class SutraLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final image = Image.asset(
-      'assets/images/Logo.png',
+      'assets/images/Logo.png.png', // matches actual file name in assets/images
       width: size,
       height: size,
       fit: BoxFit.contain,
+      filterQuality: FilterQuality.high,
+      isAntiAlias: true,
       errorBuilder: (_, __, ___) =>
           Icon(Icons.spa, size: size, color: AppColors.gold),
     );

@@ -4,6 +4,7 @@ import '../state/app_state.dart';
 import '../widgets/sutra_logo.dart';
 import '../constants/colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../constants/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -47,11 +48,15 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final ext = Theme.of(context).extension<SutraColors>();
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.indigoDeep, AppColors.indigoDarker],
+            colors: [
+              ext?.gradientStart ?? AppColors.indigoDeep,
+              ext?.gradientEnd ?? AppColors.indigoDarker,
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

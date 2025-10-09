@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../state/app_state.dart';
 import '../../widgets/question_card.dart';
-import '../../widgets/sutra_logo.dart';
 import '../../constants/colors.dart';
 import '../../constants/theme.dart';
-import '../../services/auth_service.dart';
+// import '../../services/auth_service.dart';
 import '../../widgets/sutra_app_bar.dart';
 
 class QuestionsScreen extends StatelessWidget {
@@ -14,16 +13,20 @@ class QuestionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    final questions = app.randomQuestionsWithIds; // already limited to <=16
+    // Always show questions ordered by ID ascending (null IDs last)
+    final questions = [...app.questionsWithIds]..sort((a, b) {
+        final ai = a.id;
+        final bi = b.id;
+        if (ai == null && bi == null) return 0;
+        if (ai == null) return 1; // nulls last
+        if (bi == null) return -1;
+        return ai.compareTo(bi);
+      });
     final colors = Theme.of(context).extension<SutraColors>();
     return Scaffold(
-      appBar: SutraAppBar(
+      appBar: const SutraAppBar(
         title: 'Questions',
-        actions: [
-          _BrightnessToggle(),
-          const SizedBox(width: 8),
-          const _OverflowMenu(),
-        ],
+        actions: [LanguagePickerAction()],
       ),
       body: SafeArea(
         child: Container(
@@ -41,11 +44,7 @@ class QuestionsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Column(
               children: [
-                const SizedBox(height: 4),
-                const SutraLogo(size: 72),
-                const SizedBox(height: 24),
-                _TopBar(),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 350),
@@ -77,46 +76,57 @@ class QuestionsScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.fromLTRB(22, 26, 22, 14),
+                      padding: const EdgeInsets.fromLTRB(24, 28, 24, 18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Text('Questions',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium!
-                                      .copyWith(
-                                        color: (colors?.textOnLight ??
-                                            AppColors.indigoDeep),
-                                      )),
-                              const Spacer(),
-                              _BrightnessToggle(),
-                              const SizedBox(width: 8),
-                              _OverflowMenu(
-                                  iconColor: (colors?.textOnLight ??
-                                      AppColors.indigoDeep)),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
+                          // Removed in-card header; AppBar title is sufficient
                           Expanded(
                             child: LayoutBuilder(
                               builder: (ctx, constraints) {
-                                // Adaptive columns: try 2 on narrow, 3 on wide
                                 final width = constraints.maxWidth;
-                                int columns = width > 980 ? 3 : 2;
+                                final bool singleColumn = width < 520; // phones
+                                if (singleColumn) {
+                                  return ListView.separated(
+                                    key: ValueKey('${app.language.code}_list'),
+                                    physics: const BouncingScrollPhysics(),
+                                    itemBuilder: (c, i) {
+                                      final q = questions[i];
+                                      return AnimatedQuestionCard(
+                                        index: i,
+                                        text: q.text,
+                                        maxLines: null, // let it wrap fully
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/patternPicker',
+                                            arguments: {
+                                              'question': q.text,
+                                              if (q.id != null)
+                                                'questionId': q.id,
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    separatorBuilder: (_, __) =>
+                                        const SizedBox(height: 12),
+                                    itemCount: questions.length,
+                                  );
+                                }
+                                // Wider screens: grid with 2 or 3 columns
+                                final columns = width > 980 ? 3 : 2;
                                 final itemWidth =
-                                    (width - (16 * (columns - 1))) / columns;
-                                const itemHeight = 140.0;
+                                    (width - (18 * (columns - 1))) / columns;
+                                const itemHeight = 160.0;
                                 return GridView.builder(
                                   key: ValueKey('${app.language.code}_grid'),
                                   physics: const BouncingScrollPhysics(),
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: columns,
-                                    mainAxisSpacing: 16,
-                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 18,
+                                    crossAxisSpacing: 18,
                                     childAspectRatio: itemWidth / itemHeight,
                                   ),
                                   itemCount: questions.length,
@@ -125,6 +135,8 @@ class QuestionsScreen extends StatelessWidget {
                                     return AnimatedQuestionCard(
                                       index: i,
                                       text: q.text,
+                                      maxLines:
+                                          3, // keep height consistent in grid
                                       onTap: () {
                                         Navigator.pushNamed(
                                           context,
@@ -156,153 +168,35 @@ class QuestionsScreen extends StatelessWidget {
   }
 }
 
-class _TopBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _LanguageSelector(),
-        const SizedBox(width: 12),
-        _ThemeSelector(),
-      ],
-    );
-  }
-}
+// Language picker moved into AppBar actions
+class LanguagePickerAction extends StatelessWidget {
+  const LanguagePickerAction({super.key});
 
-class _LanguageSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.parchment.withAlpha((255 * .15).round()),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.gold.withAlpha((255 * .6).round())),
-      ),
-      child: DropdownButton<AppLanguage>(
-        value: app.language,
-        dropdownColor: AppColors.indigoDarker,
-        iconEnabledColor: AppColors.gold,
-        underline: const SizedBox.shrink(),
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium!
-            .copyWith(color: AppColors.parchment),
-        onChanged: (v) {
-          if (v != null) context.read<AppState>().setLanguage(v);
-        },
-        items: AppLanguage.values
-            .map(
-              (lang) => DropdownMenuItem(
-                value: lang,
-                child: Text(lang.label),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-}
-
-class _ThemeSelector extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final app = context.watch<AppState>();
-    final colors = Theme.of(context).extension<SutraColors>();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: (colors?.surface ?? AppColors.parchment)
-            .withAlpha((255 * .15).round()),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-            color: (colors?.accent ?? AppColors.gold)
-                .withAlpha((255 * .6).round())),
-      ),
-      child: DropdownButton<ThemeVariant>(
-        value: app.themeVariant,
-        dropdownColor: colors?.gradientEnd ?? AppColors.indigoDarker,
-        iconEnabledColor: colors?.accent ?? AppColors.gold,
-        underline: const SizedBox.shrink(),
-        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-              color: colors?.textOnDark ?? AppColors.parchment,
+    final ext = Theme.of(context).extension<SutraColors>();
+    final iconColor = ext?.textOnDark ?? Colors.white;
+    return PopupMenuButton<AppLanguage>(
+      tooltip: 'Change language',
+      icon: Icon(Icons.language_rounded, color: iconColor),
+      initialValue: app.language,
+      onSelected: (lang) => context.read<AppState>().setLanguage(lang),
+      itemBuilder: (ctx) => [
+        for (final lang in AppLanguage.values)
+          PopupMenuItem<AppLanguage>(
+            value: lang,
+            child: Row(
+              children: [
+                if (app.language == lang) ...[
+                  Icon(Icons.check,
+                      size: 18, color: ext?.accent ?? AppColors.gold),
+                  const SizedBox(width: 6),
+                ],
+                Text(lang.label),
+              ],
             ),
-        onChanged: (v) {
-          if (v != null) context.read<AppState>().setThemeVariant(v);
-        },
-        items: ThemeVariant.values
-            .map(
-              (t) => DropdownMenuItem(
-                value: t,
-                child: Text(t.label),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-}
-
-class _BrightnessToggle extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final app = context.watch<AppState>();
-    final colors = Theme.of(context).extension<SutraColors>();
-    final icon = app.brightnessOverride == null
-        ? Icons.brightness_auto
-        : app.brightnessOverride == Brightness.light
-            ? Icons.light_mode
-            : Icons.dark_mode;
-    final label = app.brightnessOverride == null
-        ? 'System'
-        : app.brightnessOverride == Brightness.light
-            ? 'Light'
-            : 'Dark';
-    return Tooltip(
-      message: 'Theme brightness: $label (tap to cycle)',
-      child: InkWell(
-        onTap: () => context.read<AppState>().cycleBrightness(),
-        borderRadius: BorderRadius.circular(18),
-        child: Ink(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            color: (colors?.accent ?? AppColors.gold)
-                .withAlpha((255 * .18).round()),
           ),
-          child: Icon(
-            icon,
-            size: 22,
-            color: colors?.accent ?? AppColors.gold,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OverflowMenu extends StatelessWidget {
-  const _OverflowMenu({this.iconColor});
-  final Color? iconColor;
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      icon: iconColor != null ? Icon(Icons.more_vert, color: iconColor) : null,
-      onSelected: (value) async {
-        if (value == 'logout') {
-          // sign out and take user to login
-          try {
-            await const AuthService().signOut();
-          } catch (_) {}
-          if (context.mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
-          }
-        }
-      },
-      itemBuilder: (c) => [
-        const PopupMenuItem(value: 'logout', child: Text('Logout')),
       ],
     );
   }

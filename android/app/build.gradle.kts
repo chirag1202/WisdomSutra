@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    id("org.jetbrains.kotlin.android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -11,12 +11,12 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
@@ -35,7 +35,20 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // Temporarily disable code shrinking to avoid R8 path issues
+            isMinifyEnabled = false
+            // Also disable resource shrinking when minification is off
+            isShrinkResources = false
+            // Avoid requiring NDK for symbol stripping to stabilize CI/first builds
+            ndk {
+                debugSymbolLevel = "NONE"
+            }
         }
+    }
+
+    // Flutter fix: disable release lint that can trigger on missing intermediates in edge cases
+    lint {
+        checkReleaseBuilds = false
     }
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/theme.dart';
+import '../services/question_service.dart';
 
 /// Supported language codes in the app UI.
 enum AppLanguage { en, hi, mr, gu, bn }
@@ -23,11 +24,11 @@ class AppState extends ChangeNotifier {
   AppLanguage _language = AppLanguage.en;
   final Set<String> _favoritePatterns = {};
   Map<String, dynamic> _answers = {}; // pattern -> { 'en': 'text', ... }
-  final Map<AppLanguage, List<String>> _questions = {};
+  final Map<AppLanguage, List<QuestionItem>> _questions = {};
   bool _initialized = false;
 
   // Random selections cache per language
-  final Map<AppLanguage, List<String>> _randomSelections = {};
+  final Map<AppLanguage, List<QuestionItem>> _randomSelections = {};
 
   // Theme variant
   ThemeVariant _themeVariant = ThemeVariant.classic;
@@ -35,8 +36,15 @@ class AppState extends ChangeNotifier {
 
   bool get initialized => _initialized;
   AppLanguage get language => _language;
-  List<String> get questions => _questions[_language] ?? const [];
-  List<String> get randomQuestions => _randomSelections[_language] ?? const [];
+  // New typed getters including IDs
+  List<QuestionItem> get questionsWithIds => _questions[_language] ?? const [];
+  List<QuestionItem> get randomQuestionsWithIds =>
+      _randomSelections[_language] ?? const [];
+  // Back-compat string-only getters (derived)
+  List<String> get questions =>
+      (_questions[_language] ?? const []).map((q) => q.text).toList();
+  List<String> get randomQuestions =>
+      (_randomSelections[_language] ?? const []).map((q) => q.text).toList();
   ThemeVariant get themeVariant => _themeVariant;
   Brightness? get brightnessOverride => _brightnessOverride;
   bool isFavorite(String pattern) => _favoritePatterns.contains(pattern);
@@ -80,13 +88,40 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _loadData() async {
-    Future<List<String>> loadQ(String path) async =>
-        (json.decode(await rootBundle.loadString(path)) as List).cast<String>();
-    _questions[AppLanguage.en] = await loadQ('assets/data/questions_en.json');
-    _questions[AppLanguage.gu] = await loadQ('assets/data/questions_gu.json');
-    _questions[AppLanguage.hi] = await loadQ('assets/data/questions_hi.json');
-    _questions[AppLanguage.mr] = await loadQ('assets/data/questions_mr.json');
-    _questions[AppLanguage.bn] = await loadQ('assets/data/questions_bn.json');
+    // Try Supabase first
+    final supa = QuestionService();
+    final supaRows = await supa.fetchQuestionsWithIds();
+
+    if (supaRows.isNotEmpty) {
+      // Build typed question list
+      final items = <QuestionItem>[];
+      for (final row in supaRows) {
+        final text = (row['text'] ?? '').toString();
+        final id = row['id'];
+        if (text.isNotEmpty && (id is int || id is num)) {
+          final intId = (id as num).toInt();
+          items.add(QuestionItem(id: intId, text: text));
+        }
+      }
+      // Use same list for all languages (no lang column yet)
+      for (final lang in AppLanguage.values) {
+        _questions[lang] = List<QuestionItem>.from(items);
+      }
+    } else {
+      // Fallback to bundled assets per language
+      Future<List<QuestionItem>> loadQ(String path) async =>
+          (json.decode(await rootBundle.loadString(path)) as List)
+              .cast<String>()
+              .map((t) => QuestionItem(id: null, text: t))
+              .toList();
+      _questions[AppLanguage.en] = await loadQ('assets/data/questions_en.json');
+      _questions[AppLanguage.gu] = await loadQ('assets/data/questions_gu.json');
+      _questions[AppLanguage.hi] = await loadQ('assets/data/questions_hi.json');
+      _questions[AppLanguage.mr] = await loadQ('assets/data/questions_mr.json');
+      _questions[AppLanguage.bn] = await loadQ('assets/data/questions_bn.json');
+    }
+
+    // Answers remain local for now
     final ans = await rootBundle.loadString('assets/data/answers.json');
     _answers = json.decode(ans) as Map<String, dynamic>;
 
@@ -153,7 +188,8 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> _generateRandomFor(AppLanguage lang, {bool force = false}) {
+  List<QuestionItem> _generateRandomFor(AppLanguage lang,
+      {bool force = false}) {
     if (!force && _randomSelections.containsKey(lang)) {
       return _randomSelections[lang]!;
     }
@@ -175,4 +211,10 @@ class AppState extends ChangeNotifier {
     _randomSelections[lang] = selection;
     return selection;
   }
+}
+
+class QuestionItem {
+  final int? id;
+  final String text;
+  const QuestionItem({required this.id, required this.text});
 }

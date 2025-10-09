@@ -14,7 +14,7 @@ class QuestionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    final questions = app.randomQuestions; // already limited to <=16
+    final questions = app.randomQuestionsWithIds; // already limited to <=16
     final colors = Theme.of(context).extension<SutraColors>();
     return Scaffold(
       appBar: SutraAppBar(
@@ -120,15 +120,24 @@ class QuestionsScreen extends StatelessWidget {
                                     childAspectRatio: itemWidth / itemHeight,
                                   ),
                                   itemCount: questions.length,
-                                  itemBuilder: (c, i) => AnimatedQuestionCard(
-                                    index: i,
-                                    text: questions[i],
-                                    onTap: () => Navigator.pushNamed(
-                                      context,
-                                      '/patternPicker',
-                                      arguments: questions[i],
-                                    ),
-                                  ),
+                                  itemBuilder: (c, i) {
+                                    final q = questions[i];
+                                    return AnimatedQuestionCard(
+                                      index: i,
+                                      text: q.text,
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/patternPicker',
+                                          arguments: {
+                                            'question': q.text,
+                                            if (q.id != null)
+                                              'questionId': q.id,
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
                                 );
                               },
                             ),

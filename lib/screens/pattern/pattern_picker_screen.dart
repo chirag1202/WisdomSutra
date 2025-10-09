@@ -7,7 +7,8 @@ import '../../constants/theme.dart';
 
 class PatternPickerScreen extends StatefulWidget {
   final String? question;
-  const PatternPickerScreen({super.key, this.question});
+  final int? questionId;
+  const PatternPickerScreen({super.key, this.question, this.questionId});
 
   @override
   State<PatternPickerScreen> createState() => _PatternPickerScreenState();
@@ -22,7 +23,8 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
 
   String get patternString =>
       values.map((v) => v % 2 == 0 ? '2' : '1').join(' • ');
-  String get patternKey => values.map((v) => v % 2 == 0 ? '2' : '1').join('-');
+  // DB now expects a 4-number comma-separated pattern like "1,2,2,1"
+  String get patternKey => values.map((v) => v % 2 == 0 ? '2' : '1').join(',');
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +86,9 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
                   arguments: {
                     'pattern': patternKey,
                     'string': patternString,
+                    if (widget.questionId != null)
+                      'questionId': widget.questionId,
+                    // question id unknown here; let QuestionsScreen pass it when navigating to PatternPicker
                   },
                 ),
               ),

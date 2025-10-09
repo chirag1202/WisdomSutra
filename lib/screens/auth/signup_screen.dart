@@ -46,14 +46,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
     setState(() => _loading = true);
     try {
-      final res = await _auth.signUp(email: email, password: pass);
+      await _auth.signUp(email: email, password: pass);
       if (!mounted) return;
-      if (res.session != null) {
-        Navigator.pushReplacementNamed(context, '/questions');
-      } else {
-        // For email confirmation setups, session can be null.
-        _showError('Please check your email to confirm sign up.');
-      }
+      // Show success toast and redirect to login
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfull')),
+      );
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       _showError(e.toString());
     } finally {

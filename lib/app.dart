@@ -25,15 +25,24 @@ class WisdomSutraApp extends StatelessWidget {
       case '/questions':
         return MaterialPageRoute(builder: (_) => const QuestionsScreen());
       case '/patternPicker':
-        final q = settings.arguments as String?;
+        final args = settings.arguments;
+        String? q;
+        int? qId;
+        if (args is String?) {
+          q = args;
+        } else if (args is Map) {
+          q = args['question'] as String?;
+          qId = args['questionId'] as int?;
+        }
         return MaterialPageRoute(
-            builder: (_) => PatternPickerScreen(question: q));
+            builder: (_) => PatternPickerScreen(question: q, questionId: qId));
       case '/viewAnswer':
         final args = settings.arguments as Map? ?? {};
         return MaterialPageRoute(
           builder: (_) => ViewAnswerScreen(
               pattern: args['pattern'] ?? '1-2-2-1',
-              patternDisplay: args['string'] ?? '1 • 2 • 2 • 1'),
+              patternDisplay: args['string'] ?? '1 • 2 • 2 • 1',
+              questionId: args['questionId'] as int?),
         );
     }
     return null;

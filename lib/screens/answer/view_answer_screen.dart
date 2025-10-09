@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../../state/app_state.dart';
 import '../../widgets/answer_card.dart';
@@ -35,21 +34,10 @@ class _ViewAnswerScreenState extends State<ViewAnswerScreen> {
 
   Future<void> _maybeFetch() async {
     if (widget.questionId == null) {
-      if (kDebugMode) {
-        // ignore: avoid_print
-        print('ViewAnswerScreen: questionId is null, skipping DB fetch; '
-            'will use local file if available for pattern=${widget.pattern}');
-      }
       return; // fall back to local answers
     }
     setState(() => _loading = true);
     final svc = AnswerService();
-    // Debug log the params we are fetching with
-    if (kDebugMode) {
-      // ignore: avoid_print
-      print('ViewAnswerScreen: fetching from DB with questionId='
-          '${widget.questionId}, pattern=${widget.pattern}');
-    }
     final ans = await svc.fetchAnswer(
       questionId: widget.questionId!,
       pattern: widget.pattern,
@@ -72,11 +60,6 @@ class _ViewAnswerScreenState extends State<ViewAnswerScreen> {
     if (_answer != null && _answer!.isNotEmpty) {
       resolvedText = _answer!;
     } else {
-      if (kDebugMode) {
-        // ignore: avoid_print
-        print(
-            'ViewAnswerScreen: using local fallback for pattern=${widget.pattern}');
-      }
       // Local asset fallback now uses compact 4-digit keys like "1221"
       final answerMap = app.answerForPattern(widget.pattern);
       if (answerMap != null) {

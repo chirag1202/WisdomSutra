@@ -5,6 +5,7 @@ import '../../constants/colors.dart';
 import '../../services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/sutra_app_bar.dart';
+import '../../constants/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -85,6 +86,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.extension<SutraColors>();
+    final textColor = colors?.textOnDark ?? AppColors.parchment;
+    final hintColor = textColor.withOpacity(0.65);
+    final accent = colors?.accent ?? AppColors.gold;
+    OutlineInputBorder _border(Color c) => OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: c, width: 1.2),
+        );
     return Scaffold(
       appBar: const SutraAppBar(title: 'Login', showHome: true),
       body: Stack(
@@ -118,20 +127,49 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 28),
                     TextField(
-                        controller: _emailCtrl,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          hintText: 'Email',
-                          errorText: _emailError,
-                        )),
+                      controller: _emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      style:
+                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      cursorColor: accent,
+                      decoration: InputDecoration(
+                        hintText: 'Email',
+                        hintStyle: theme.textTheme.bodyLarge
+                            ?.copyWith(color: hintColor),
+                        errorText: _emailError,
+                        enabledBorder: _border(accent.withOpacity(.6)),
+                        focusedBorder: _border(accent),
+                        errorBorder: _border(Colors.redAccent),
+                        focusedErrorBorder: _border(Colors.redAccent),
+                        filled: true,
+                        fillColor: (colors?.surface ?? AppColors.parchment)
+                            .withOpacity(.08),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
+                      ),
+                    ),
                     const SizedBox(height: 18),
                     TextField(
                       obscureText: true,
                       controller: _passCtrl,
-                      decoration: const InputDecoration(
-                          hintText: 'Password',
-                          suffixIcon:
-                              Icon(Icons.visibility, color: AppColors.gold)),
+                      style:
+                          theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                      cursorColor: accent,
+                      decoration: InputDecoration(
+                        hintText: 'Password',
+                        hintStyle: theme.textTheme.bodyLarge
+                            ?.copyWith(color: hintColor),
+                        suffixIcon: Icon(Icons.visibility, color: accent),
+                        enabledBorder: _border(accent.withOpacity(.6)),
+                        focusedBorder: _border(accent),
+                        errorBorder: _border(Colors.redAccent),
+                        focusedErrorBorder: _border(Colors.redAccent),
+                        filled: true,
+                        fillColor: (colors?.surface ?? AppColors.parchment)
+                            .withOpacity(.08),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
+                      ),
                     ),
                     const SizedBox(height: 28),
                     GoldenButton(

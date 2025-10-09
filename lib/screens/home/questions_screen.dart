@@ -110,7 +110,7 @@ class QuestionsScreen extends StatelessWidget {
                                     (width - (16 * (columns - 1))) / columns;
                                 const itemHeight = 140.0;
                                 return GridView.builder(
-                                  key: ValueKey(app.language.code + '_grid'),
+                                  key: ValueKey('${app.language.code}_grid'),
                                   physics: const BouncingScrollPhysics(),
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(

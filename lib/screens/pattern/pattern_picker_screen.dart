@@ -73,8 +73,7 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
                         index: i, value: values[i], onChanged: _onChanged)),
               ),
             ),
-            const SizedBox(height: 28),
-            Text('Pattern:  $patternString', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 8),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),

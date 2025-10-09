@@ -3,6 +3,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../app.dart';
+import '../utils/logger.dart';
 
 class DeepLinkService {
   DeepLinkService._();
@@ -17,8 +18,11 @@ class DeepLinkService {
     // Handle subsequent links
     _sub?.cancel();
     _sub = _appLinks!.uriLinkStream.listen((uri) {
+      Log.i('DeepLinkService: received uri: $uri');
       _handleUri(uri);
-    }, onError: (_) {});
+    }, onError: (e, st) {
+      Log.e('DeepLinkService: uri stream error', e, st as StackTrace?);
+    });
   }
 
   Future<void> _handleUri(Uri uri) async {
@@ -27,13 +31,15 @@ class DeepLinkService {
     try {
       Supabase.instance.client.auth.onAuthStateChange; // ensure client ready
       await Supabase.instance.client.auth.getSessionFromUrl(uri);
-    } catch (_) {
-      // ignore
+      Log.d('DeepLinkService: getSessionFromUrl done');
+    } catch (e, st) {
+      Log.e('DeepLinkService: getSessionFromUrl failed', e, st);
     }
     // If session now exists, go to Questions
     final nav = WisdomSutraApp.navigatorKey.currentState;
     final session = Supabase.instance.client.auth.currentSession;
     if (nav != null && session != null) {
+      Log.i('DeepLinkService: session present, navigating to /questions');
       nav.pushNamedAndRemoveUntil('/questions', (_) => false);
       return;
     }
@@ -42,6 +48,7 @@ class DeepLinkService {
       if (nav == null) return;
       final currentRoute = ModalRoute.of(nav.context)?.settings.name;
       if (currentRoute != '/questions' && currentRoute != '/login') {
+        Log.i('DeepLinkService: forcing navigation to /login');
         nav.pushNamedAndRemoveUntil('/login', (_) => false);
       }
     }

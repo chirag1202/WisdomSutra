@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'constants/theme.dart';
 import 'state/app_state.dart';
 import 'screens/splash_screen.dart';
@@ -19,10 +20,18 @@ class WisdomSutraApp extends StatelessWidget {
       case '/':
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case '/login':
+        final session = Supabase.instance.client.auth.currentSession;
+        if (session != null) {
+          return MaterialPageRoute(builder: (_) => const QuestionsScreen());
+        }
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case '/signup':
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case '/questions':
+        final session = Supabase.instance.client.auth.currentSession;
+        if (session == null) {
+          return MaterialPageRoute(builder: (_) => const LoginScreen());
+        }
         return MaterialPageRoute(builder: (_) => const QuestionsScreen());
       case '/patternPicker':
         final args = settings.arguments;

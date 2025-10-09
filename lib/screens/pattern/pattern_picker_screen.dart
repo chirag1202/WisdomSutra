@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../widgets/pattern_wheel.dart';
 import '../../widgets/golden_button.dart';
 import '../../constants/colors.dart';
+import '../../widgets/sutra_app_bar.dart';
+import '../../constants/theme.dart';
 
 class PatternPickerScreen extends StatefulWidget {
   final String? question;
@@ -25,19 +27,16 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.extension<SutraColors>();
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.gold),
-      ),
+      appBar: const SutraAppBar(title: 'Choose Pattern'),
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              colors: [AppColors.indigoDeep, AppColors.indigoDarker],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+            colors?.gradientStart ?? AppColors.indigoDeep,
+            colors?.gradientEnd ?? AppColors.indigoDarker
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
         ),
         child: Column(
           children: [
@@ -60,7 +59,8 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.gold, width: 2),
+                border: Border.all(
+                    color: (colors?.accent ?? AppColors.gold), width: 2),
                 borderRadius: BorderRadius.circular(28),
               ),
               child: Row(

@@ -43,7 +43,7 @@ class GoldenButton extends StatelessWidget {
           boxShadow: filled
               ? [
                   BoxShadow(
-                    color: AppColors.gold.withOpacity(.55),
+                    color: AppColors.gold.withAlpha((255 * .55).round()),
                     blurRadius: 18,
                     spreadRadius: 1,
                     offset: const Offset(0, 6),

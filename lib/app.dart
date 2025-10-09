@@ -11,6 +11,8 @@ import 'screens/answer/view_answer_screen.dart';
 
 class WisdomSutraApp extends StatelessWidget {
   const WisdomSutraApp({super.key});
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,12 +42,25 @@ class WisdomSutraApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AppState(),
-      child: MaterialApp(
-        title: 'Wisdom Sutra',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(),
-        onGenerateRoute: _onGenerateRoute,
+      create: (_) => AppState()..initialize(),
+      child: Consumer<AppState>(
+        builder: (_, app, __) => Builder(
+          builder: (context) {
+            final platformBrightness =
+                MediaQuery.maybeOf(context)?.platformBrightness ??
+                    Brightness.dark;
+            final effectiveBrightness =
+                app.brightnessOverride ?? platformBrightness;
+            return MaterialApp(
+              title: 'Wisdom Sutra',
+              debugShowCheckedModeBanner: false,
+              theme: buildAppTheme(app.themeVariant,
+                  brightness: effectiveBrightness),
+              navigatorKey: navigatorKey,
+              onGenerateRoute: _onGenerateRoute,
+            );
+          },
+        ),
       ),
     );
   }

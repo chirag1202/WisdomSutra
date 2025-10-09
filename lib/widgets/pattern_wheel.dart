@@ -51,11 +51,11 @@ class _PatternWheelState extends State<PatternWheel> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(.35),
+              color: Colors.black.withAlpha((255 * .35).round()),
               blurRadius: 20,
               offset: const Offset(0, 12)),
           BoxShadow(
-              color: AppColors.gold.withOpacity(.3),
+              color: AppColors.gold.withAlpha((255 * .3).round()),
               blurRadius: 12,
               spreadRadius: -4),
         ],

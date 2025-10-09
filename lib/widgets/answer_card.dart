@@ -23,10 +23,9 @@ class AnswerCard extends StatelessWidget {
             const SizedBox(height: 22),
             if (pattern.isNotEmpty)
               Text('Pattern: $pattern',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: AppColors.indigoDeep.withOpacity(.7))),
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color:
+                          AppColors.indigoDeep.withAlpha((255 * .7).round()))),
           ],
         ),
       ),

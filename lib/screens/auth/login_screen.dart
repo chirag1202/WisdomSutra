@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
             await context.read<AppState>().setUserName(name);
           }
         } catch (_) {}
-        Navigator.pushReplacementNamed(context, '/questions');
+        Navigator.pushReplacementNamed(context, '/restrictedDays');
       } else {
         _showError('Login failed.');
       }

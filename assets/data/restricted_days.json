@@ -1,0 +1,84 @@
+{
+  "restrictedDays": [
+    {
+      "month": 1,
+      "day": 1,
+      "name": "New Year's Day - Cosmic Reset"
+    },
+    {
+      "month": 1,
+      "day": 14,
+      "name": "Makar Sankranti - Solar Transition"
+    },
+    {
+      "month": 2,
+      "day": 14,
+      "name": "Valentine's Day - Heart Alignment"
+    },
+    {
+      "month": 3,
+      "day": 8,
+      "name": "Maha Shivaratri - Great Night of Shiva"
+    },
+    {
+      "month": 3,
+      "day": 21,
+      "name": "Spring Equinox - Balance Point"
+    },
+    {
+      "month": 4,
+      "day": 13,
+      "name": "Vaisakhi - Harvest Celebration"
+    },
+    {
+      "month": 5,
+      "day": 23,
+      "name": "Buddha Purnima - Enlightenment Day"
+    },
+    {
+      "month": 6,
+      "day": 21,
+      "name": "Summer Solstice - Peak Light"
+    },
+    {
+      "month": 7,
+      "day": 15,
+      "name": "Guru Purnima - Teacher's Moon"
+    },
+    {
+      "month": 8,
+      "day": 15,
+      "name": "Krishna Janmashtami - Divine Birth"
+    },
+    {
+      "month": 9,
+      "day": 23,
+      "name": "Autumn Equinox - Harvest Balance"
+    },
+    {
+      "month": 10,
+      "day": 2,
+      "name": "Gandhi Jayanti - Peace Day"
+    },
+    {
+      "month": 10,
+      "day": 24,
+      "name": "Dussehra - Victory of Light"
+    },
+    {
+      "month": 11,
+      "day": 12,
+      "name": "Diwali - Festival of Lights"
+    },
+    {
+      "month": 12,
+      "day": 21,
+      "name": "Winter Solstice - Deepest Night"
+    },
+    {
+      "month": 12,
+      "day": 25,
+      "name": "Christmas - Universal Love"
+    }
+  ]
+}

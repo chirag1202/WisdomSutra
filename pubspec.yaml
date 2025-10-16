@@ -57,6 +57,7 @@ flutter:
     - assets/data/questions_mr.json
     - assets/data/questions_bn.json
     - assets/data/answers.json
+    - assets/data/restricted_days.json
     - assets/images/Logo.png.png
     - assets/images/
   

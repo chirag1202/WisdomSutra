@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
         // Existing user - check auth status
         final session = Supabase.instance.client.auth.currentSession;
         if (session != null) {
-          nav.pushReplacementNamed('/questions');
+          nav.pushReplacementNamed('/restrictedDays');
         } else {
           nav.pushReplacementNamed('/login');
         }

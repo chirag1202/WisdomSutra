@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'colors.dart';
 
 /// Available theme variants.
@@ -236,9 +235,8 @@ ThemeData buildAppTheme(ThemeVariant variant,
   final base = (isDark
       ? ThemeData.dark(useMaterial3: false)
       : ThemeData.light(useMaterial3: false));
-  final headingFont = GoogleFonts.playfairDisplay();
-  // Gujarati font loaded on demand via helper; no direct reference needed here.
-  final bodyFont = GoogleFonts.nunito();
+  const headingFont = TextStyle(fontFamily: 'PlayfairDisplay');
+  const bodyFont = TextStyle(fontFamily: 'Nunito');
   final ext = _paletteFor(variant, brightness);
 
   return base
@@ -328,7 +326,8 @@ ThemeData buildAppTheme(ThemeVariant variant,
       );
 }
 
-TextStyle gujaratiStyle([Color? color]) => GoogleFonts.notoSansGujarati(
+TextStyle gujaratiStyle([Color? color]) => TextStyle(
+      fontFamily: 'NotoSansGujarati',
       fontSize: 20,
       height: 1.3,
       color: color ?? AppColors.indigoDeep,

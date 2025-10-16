@@ -59,17 +59,15 @@ flutter:
     - assets/data/answers.json
     - assets/images/Logo.png.png
     - assets/images/
-  # NOTE: Font files are not added yet to keep this scaffold lightweight and compiling.
-  # To embed locally (preferred for production & offline):
-  # fonts:
-  #   - family: PlayfairDisplay
-  #     fonts:
-  #       - asset: assets/fonts/PlayfairDisplay-Regular.ttf
-  #       - asset: assets/fonts/PlayfairDisplay-SemiBold.ttf
-  #         weight: 600
-  #   - family: NotoSansGujarati
-  #     fonts:
-  #       - asset: assets/fonts/NotoSansGujarati-Regular.ttf
-  #       - asset: assets/fonts/NotoSansGujarati-Medium.ttf
-  #         weight: 500
-  # GoogleFonts package is used meanwhile. Place TTFs later and uncomment.
+  
+  # Local fonts embedded for offline use
+  fonts:
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay.ttf
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito.ttf
+    - family: NotoSansGujarati
+      fonts:
+        - asset: assets/fonts/NotoSansGujarati.ttf

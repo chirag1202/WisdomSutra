@@ -3,42 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../constants/colors.dart';
 import '../constants/theme.dart';
+import '../models/restricted_day.dart';
+import '../services/restricted_dates_service.dart';
 import '../widgets/golden_button.dart';
-
-class RestrictedDay {
-  final int month;
-  final int day;
-  final String name;
-
-  RestrictedDay({
-    required this.month,
-    required this.day,
-    required this.name,
-  });
-
-  factory RestrictedDay.fromJson(Map<String, dynamic> json) {
-    return RestrictedDay(
-      month: json['month'] as int,
-      day: json['day'] as int,
-      name: json['name'] as String,
-    );
-  }
-
-  String get monthName => [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ][month - 1];
-}
 
 class RestrictedDaysScreen extends StatefulWidget {
   const RestrictedDaysScreen({super.key});
@@ -49,6 +16,7 @@ class RestrictedDaysScreen extends StatefulWidget {
 
 class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
     with SingleTickerProviderStateMixin {
+  final RestrictedDatesService _service = const RestrictedDatesService();
   List<RestrictedDay> _restrictedDays = [];
   bool _loading = true;
   bool _isRestricted = false;
@@ -75,39 +43,48 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
   }
 
   Future<void> _loadRestrictedDays() async {
+    List<RestrictedDay> days = [];
+    try {
+      days = await _service.fetchRestrictedDates();
+    } catch (_) {
+      // Service errors are handled by falling back to bundled data
+    }
+
+    if (days.isEmpty) {
+      days = await _loadRestrictedDaysFromAsset();
+    }
+
+    days.sort((a, b) {
+      if (a.month == b.month) {
+        return a.day.compareTo(b.day);
+      }
+      return a.month.compareTo(b.month);
+    });
+
+    final now = DateTime.now();
+    final isRestricted = days.any(
+      (day) => day.month == now.month && day.day == now.day,
+    );
+
+    setState(() {
+      _restrictedDays = days;
+      _isRestricted = isRestricted;
+      _loading = false;
+    });
+  }
+
+  Future<List<RestrictedDay>> _loadRestrictedDaysFromAsset() async {
     try {
       final jsonString =
           await rootBundle.loadString('assets/data/restricted_days.json');
       final jsonData = json.decode(jsonString) as Map<String, dynamic>;
-      final List<dynamic> daysJson = jsonData['restrictedDays'] as List<dynamic>;
-
-      final days = daysJson
+      final List<dynamic> daysJson =
+          jsonData['restrictedDays'] as List<dynamic>;
+      return daysJson
           .map((day) => RestrictedDay.fromJson(day as Map<String, dynamic>))
           .toList();
-
-      // Check if today is a restricted day
-      final now = DateTime.now();
-      final todayMonth = now.month;
-      final todayDay = now.day;
-
-      final isRestricted = days.any(
-        (day) => day.month == todayMonth && day.day == todayDay,
-      );
-
-      setState(() {
-        _restrictedDays = days;
-        _isRestricted = isRestricted;
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _loading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading restricted days: $e')),
-        );
-      }
+    } catch (_) {
+      return <RestrictedDay>[];
     }
   }
 
@@ -142,10 +119,27 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
     );
   }
 
+  List<_MonthGroup> _groupByMonth(List<RestrictedDay> days) {
+    final Map<int, List<int>> grouped = {};
+    for (final day in days) {
+      grouped.putIfAbsent(day.month, () => <int>[]).add(day.day);
+    }
+    final entries = grouped.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    return entries
+        .map((entry) => _MonthGroup(
+              month: entry.key,
+              days: (entry.value..sort()),
+            ))
+        .toList(growable: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<SutraColors>();
     final theme = Theme.of(context);
+    final monthGroups = _groupByMonth(_restrictedDays);
+    final now = DateTime.now();
 
     if (_loading) {
       return Scaffold(
@@ -201,7 +195,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                   Text(
                     'Certain days hold deep silence in the universe.\nPlease return tomorrow.',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: (colors?.textOnDark ?? Colors.white).withOpacity(0.85),
+                      color: (colors?.textOnDark ?? Colors.white)
+                          .withOpacity(0.85),
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -218,7 +213,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                   Text(
                     'Today the universe welcomes your questions',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: (colors?.textOnDark ?? Colors.white).withOpacity(0.85),
+                      color: (colors?.textOnDark ?? Colors.white)
+                          .withOpacity(0.85),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -231,7 +227,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                           .withOpacity(0.93),
                       borderRadius: BorderRadius.circular(32),
                       border: Border.all(
-                        color: (colors?.accent ?? AppColors.gold).withOpacity(0.55),
+                        color: (colors?.accent ?? AppColors.gold)
+                            .withOpacity(0.55),
                         width: 1.2,
                       ),
                       boxShadow: [
@@ -241,7 +238,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                           offset: const Offset(0, 14),
                         ),
                         BoxShadow(
-                          color: (colors?.accent ?? AppColors.gold).withOpacity(0.25),
+                          color: (colors?.accent ?? AppColors.gold)
+                              .withOpacity(0.25),
                           blurRadius: 36,
                           spreadRadius: -6,
                         ),
@@ -252,96 +250,100 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Restricted Days',
+                          'The Sacred Days',
                           style: theme.textTheme.headlineMedium!.copyWith(
                             color: colors?.textOnLight ?? AppColors.indigoDeep,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: _restrictedDays.length,
-                            itemBuilder: (context, index) {
-                              final day = _restrictedDays[index];
-                              final now = DateTime.now();
-                              final isToday = day.month == now.month && day.day == now.day;
-
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: isToday
-                                      ? (colors?.accent ?? AppColors.gold).withOpacity(0.15)
-                                      : Colors.white.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: isToday
-                                      ? Border.all(
-                                          color: colors?.accent ?? AppColors.gold,
-                                          width: 2,
-                                        )
-                                      : null,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 60,
-                                      height: 60,
-                                      decoration: BoxDecoration(
-                                        color: (colors?.accent ?? AppColors.gold)
-                                            .withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            day.day.toString(),
-                                            style: theme.textTheme.headlineMedium!.copyWith(
-                                              color: colors?.accent ?? AppColors.gold,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            day.monthName.substring(0, 3),
-                                            style: theme.textTheme.bodySmall!.copyWith(
-                                              color: colors?.textOnLight ?? AppColors.indigoDeep,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            day.name,
-                                            style: theme.textTheme.bodyLarge!.copyWith(
-                                              color: colors?.textOnLight ?? AppColors.indigoDeep,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          if (isToday) ...[
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Today',
-                                              style: theme.textTheme.bodySmall!.copyWith(
-                                                color: colors?.accent ?? AppColors.gold,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                        const SizedBox(height: 8),
+                        Text(
+                          'Grouped by lunar whispers of each month.',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: (colors?.textOnLight ?? AppColors.indigoDeep)
+                                .withOpacity(0.7),
                           ),
                         ),
+                        const SizedBox(height: 20),
+                        _MonthTableHeader(colors: colors, theme: theme),
+                        const SizedBox(height: 12),
+                        if (monthGroups.isEmpty)
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                'No sacred days configured yet.',
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colors?.textOnLight ??
+                                      AppColors.indigoDeep,
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: ListView.separated(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: monthGroups.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 8),
+                              itemBuilder: (context, index) {
+                                final monthGroup = monthGroups[index];
+                                final isCurrentMonth =
+                                    monthGroup.month == now.month;
+                                final isTodayRestricted = isCurrentMonth &&
+                                    monthGroup.days.contains(now.day) &&
+                                    _isRestricted;
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 18,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isCurrentMonth
+                                        ? (colors?.accent ?? AppColors.gold)
+                                            .withOpacity(0.16)
+                                        : Colors.white.withOpacity(0.55),
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: isTodayRestricted
+                                        ? Border.all(
+                                            color: colors?.accent ??
+                                                AppColors.gold,
+                                            width: 2,
+                                          )
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          monthGroup.monthName,
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(
+                                            color: colors?.textOnLight ??
+                                                AppColors.indigoDeep,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          monthGroup.days.join(', '),
+                                          style: theme.textTheme.bodyLarge
+                                              ?.copyWith(
+                                            color: colors?.textOnLight ??
+                                                AppColors.indigoDeep,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -356,6 +358,69 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MonthGroup {
+  final int month;
+  final List<int> days;
+
+  const _MonthGroup({required this.month, required this.days});
+
+  String get monthName => const [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ][month - 1];
+}
+
+class _MonthTableHeader extends StatelessWidget {
+  final SutraColors? colors;
+  final ThemeData theme;
+
+  const _MonthTableHeader({required this.colors, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    final baseColor = colors?.textOnLight ?? AppColors.indigoDeep;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.65),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Month',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: baseColor,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              'Dates',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: baseColor,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

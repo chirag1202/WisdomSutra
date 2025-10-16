@@ -53,6 +53,11 @@ class AppState extends ChangeNotifier {
   Map<String, dynamic>? answerForPattern(String pattern) => _answers[pattern];
   Iterable<String> get favorites => _favoritePatterns;
 
+  // Helper method to get SharedPreferences instance
+  Future<SharedPreferences> getPreferences() async {
+    return await SharedPreferences.getInstance();
+  }
+
   Future<void> initialize() async {
     if (_initialized) return;
     final prefs = await SharedPreferences.getInstance();

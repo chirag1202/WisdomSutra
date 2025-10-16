@@ -4,11 +4,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'constants/theme.dart';
 import 'state/app_state.dart';
 import 'screens/splash_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/home/questions_screen.dart';
 import 'screens/pattern/pattern_picker_screen.dart';
 import 'screens/answer/view_answer_screen.dart';
+import 'screens/restricted_days_screen.dart';
 
 class WisdomSutraApp extends StatelessWidget {
   const WisdomSutraApp({super.key});
@@ -19,14 +21,22 @@ class WisdomSutraApp extends StatelessWidget {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => const SplashScreen());
+      case '/onboarding':
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
       case '/login':
         final session = Supabase.instance.client.auth.currentSession;
         if (session != null) {
-          return MaterialPageRoute(builder: (_) => const QuestionsScreen());
+          return MaterialPageRoute(builder: (_) => const RestrictedDaysScreen());
         }
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case '/signup':
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
+      case '/restrictedDays':
+        final session = Supabase.instance.client.auth.currentSession;
+        if (session == null) {
+          return MaterialPageRoute(builder: (_) => const LoginScreen());
+        }
+        return MaterialPageRoute(builder: (_) => const RestrictedDaysScreen());
       case '/questions':
         final session = Supabase.instance.client.auth.currentSession;
         if (session == null) {

@@ -1,0 +1,71 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Flutter clean and pub get",
+			"type": "shell",
+			"command": "flutter clean ; flutter pub get",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart-cli"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Flutter pub get only",
+			"type": "shell",
+			"command": "flutter pub get",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart-cli"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Flutter pub get only",
+			"type": "shell",
+			"command": "flutter pub get",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart-cli"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Flutter pub get only",
+			"type": "shell",
+			"command": "flutter pub get",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart-cli"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Flutter build apk (release split-per-abi)",
+			"type": "shell",
+			"command": "flutter build apk --release --split-per-abi",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Flutter build apk (release arm64)",
+			"type": "shell",
+			"command": "flutter build apk --release --target-platform android-arm64",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Flutter clean and pub get",
+			"type": "shell",
+			"command": "flutter clean ; flutter pub get",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

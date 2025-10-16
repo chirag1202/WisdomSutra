@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'constants/theme.dart';
 import 'state/app_state.dart';
 import 'screens/splash_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/home/questions_screen.dart';
@@ -19,6 +20,8 @@ class WisdomSutraApp extends StatelessWidget {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => const SplashScreen());
+      case '/onboarding':
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
       case '/login':
         final session = Supabase.instance.client.auth.currentSession;
         if (session != null) {

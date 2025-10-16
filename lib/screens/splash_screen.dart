@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../state/app_state.dart';
 import '../widgets/sutra_logo.dart';
 import '../constants/colors.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -30,12 +30,24 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       _controller.forward();
       await Future.delayed(const Duration(milliseconds: 1200));
-      final session = Supabase.instance.client.auth.currentSession;
+      
+      // Check if onboarding has been completed
+      final prefs = await context.read<AppState>().getPreferences();
+      final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+      
       if (!mounted) return;
-      if (session != null) {
-        nav.pushReplacementNamed('/questions');
+      
+      if (!onboardingCompleted) {
+        // First time user - show onboarding
+        nav.pushReplacementNamed('/onboarding');
       } else {
-        nav.pushReplacementNamed('/login');
+        // Existing user - check auth status
+        final session = Supabase.instance.client.auth.currentSession;
+        if (session != null) {
+          nav.pushReplacementNamed('/questions');
+        } else {
+          nav.pushReplacementNamed('/login');
+        }
       }
     });
   }

@@ -29,7 +29,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage < 2) {
+    if (_currentPage < 3) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
@@ -100,6 +100,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _buildPage(
                       context: context,
                       icon: Icon(
+                        Icons.menu_book_rounded,
+                        size: 100,
+                        color: ext?.accent ?? AppColors.gold,
+                      ),
+                      title: 'Rooted in Myth',
+                      description:
+                          'WisdomSutra draws from a mythical scripture, penned seventy years ago, said to hold guidance for every seeker. Each pattern unlocks a verse meant just for you.',
+                    ),
+                    _buildPage(
+                      context: context,
+                      icon: Icon(
                         Icons.touch_app,
                         size: 100,
                         color: ext?.accent ?? AppColors.gold,
@@ -128,7 +139,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    3,
+                    4,
                     (index) => Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       width: _currentPage == index ? 24 : 8,
@@ -151,7 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: ElevatedButton(
                     onPressed: _nextPage,
                     child: Text(
-                      _currentPage == 2 ? 'Get Started' : 'Next',
+                      _currentPage == 3 ? 'Get Started' : 'Next',
                       style: textTheme.titleLarge?.copyWith(
                         color: ext?.textOnLight ?? AppColors.indigoDeep,
                         fontWeight: FontWeight.w600,

@@ -97,7 +97,11 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
                 children: List.generate(
                     4,
                     (i) => PatternWheel(
-                        index: i, value: values[i], onChanged: _onChanged)),
+                          index: i,
+                          value: values[i],
+                          onChanged: _onChanged,
+                          isTouched: touchedRollers.contains(i),
+                        )),
               ),
             ),
             const SizedBox(height: 8),

@@ -25,70 +25,83 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                const SutraLogo(size: 120),
-                const SizedBox(height: 40),
-                Text(
-                  'Welcome to WisdomSutra',
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    color: colors?.textOnDark ?? AppColors.parchment,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 14),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          const SutraLogo(size: 120),
+                          const SizedBox(height: 40),
+                          Text(
+                            'Welcome to WisdomSutra',
+                            style: theme.textTheme.displaySmall?.copyWith(
+                              color: colors?.textOnDark ?? AppColors.parchment,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            "Discover ancient wisdom and guidance for life's questions through our mystical divination system.",
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: colors?.textOnDark ?? AppColors.parchment,
+                              height: 1.5,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 40),
+                          _buildFeatureCard(
+                            context,
+                            icon: Icons.menu_book_rounded,
+                            title: 'Rooted in Myth',
+                            description:
+                                'WisdomSutra draws from a mythical scripture, penned seventy years ago, said to hold guidance for every seeker.',
+                            colors: colors,
+                            theme: theme,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildFeatureCard(
+                            context,
+                            icon: Icons.touch_app,
+                            title: 'How It Works',
+                            description:
+                                'Choose a question that speaks to you, then swipe the four sacred rollers to generate your unique pattern.',
+                            colors: colors,
+                            theme: theme,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildFeatureCard(
+                            context,
+                            icon: Icons.security,
+                            title: 'Your Privacy',
+                            description:
+                                'Your journey is personal and secure. All your questions and answers are kept private.',
+                            colors: colors,
+                            theme: theme,
+                          ),
+                          const Spacer(),
+                          GoldenButton(
+                            label: 'Ask a Question',
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/questions');
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  "Discover ancient wisdom and guidance for life's questions through our mystical divination system.",
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colors?.textOnDark ?? AppColors.parchment,
-                    height: 1.5,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                _buildFeatureCard(
-                  context,
-                  icon: Icons.menu_book_rounded,
-                  title: 'Rooted in Myth',
-                  description:
-                      'WisdomSutra draws from a mythical scripture, penned seventy years ago, said to hold guidance for every seeker.',
-                  colors: colors,
-                  theme: theme,
-                ),
-                const SizedBox(height: 20),
-                _buildFeatureCard(
-                  context,
-                  icon: Icons.touch_app,
-                  title: 'How It Works',
-                  description:
-                      'Choose a question that speaks to you, then swipe the four sacred rollers to generate your unique pattern.',
-                  colors: colors,
-                  theme: theme,
-                ),
-                const SizedBox(height: 20),
-                _buildFeatureCard(
-                  context,
-                  icon: Icons.security,
-                  title: 'Your Privacy',
-                  description:
-                      'Your journey is personal and secure. All your questions and answers are kept private.',
-                  colors: colors,
-                  theme: theme,
-                ),
-                const Spacer(),
-                GoldenButton(
-                  label: 'Ask a Question',
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/restrictedDays');
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -137,8 +150,8 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        (colors?.textOnDark ?? AppColors.parchment).withOpacity(0.85),
+                    color: (colors?.textOnDark ?? AppColors.parchment)
+                        .withOpacity(0.85),
                     height: 1.4,
                   ),
                 ),

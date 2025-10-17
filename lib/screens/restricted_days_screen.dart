@@ -88,8 +88,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
     }
   }
 
-  void _proceedToQuestions() {
-    Navigator.pushReplacementNamed(context, '/questions');
+  void _goToHome() {
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   Widget _buildShimmerText(String text, TextStyle style, SutraColors? colors) {
@@ -353,8 +353,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                 const SizedBox(height: 24),
                 if (!_isRestricted)
                   GoldenButton(
-                    label: 'Proceed',
-                    onPressed: _proceedToQuestions,
+                    label: 'Continue',
+                    onPressed: _goToHome,
                   ),
               ],
             ),

@@ -41,7 +41,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Discover ancient wisdom and guidance for life\'s questions through our mystical divination system.',
+                  "Discover ancient wisdom and guidance for life's questions through our mystical divination system.",
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: colors?.textOnDark ?? AppColors.parchment,
                     height: 1.5,
@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.touch_app,
                   title: 'How It Works',
                   description:
-                      'Choose a question that speaks to you, then tap the sacred wheel four times to generate your unique pattern.',
+                      'Choose a question that speaks to you, then swipe the four sacred rollers to generate your unique pattern.',
                   colors: colors,
                   theme: theme,
                 ),

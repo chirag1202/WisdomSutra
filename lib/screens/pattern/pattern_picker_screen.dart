@@ -22,10 +22,8 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
 
   void _onChanged(int idx, int val) {
     // Mark this roller as touched
-    if (!touchedRollers.contains(idx)) {
-      setState(() {
-        touchedRollers.add(idx);
-      });
+    if (touchedRollers.add(idx)) {
+      setState(() {});
     }
     // Avoid setState for value updates so the whole screen doesn't rebuild on every tick.
     // We only need the latest values when user taps "Reveal Answer".

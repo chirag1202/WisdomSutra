@@ -7,6 +7,7 @@ import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
+import 'screens/home/home_screen.dart';
 import 'screens/home/questions_screen.dart';
 import 'screens/pattern/pattern_picker_screen.dart';
 import 'screens/answer/view_answer_screen.dart';
@@ -26,11 +27,17 @@ class WisdomSutraApp extends StatelessWidget {
       case '/login':
         final session = Supabase.instance.client.auth.currentSession;
         if (session != null) {
-          return MaterialPageRoute(builder: (_) => const RestrictedDaysScreen());
+          return MaterialPageRoute(builder: (_) => const HomeScreen());
         }
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case '/signup':
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
+      case '/home':
+        final session = Supabase.instance.client.auth.currentSession;
+        if (session == null) {
+          return MaterialPageRoute(builder: (_) => const LoginScreen());
+        }
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case '/restrictedDays':
         final session = Supabase.instance.client.auth.currentSession;
         if (session == null) {

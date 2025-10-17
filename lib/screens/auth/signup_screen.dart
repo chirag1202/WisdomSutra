@@ -20,6 +20,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? _emailError;
   String? _confirmError;
   bool _loading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   final _auth = const AuthService();
 
   @override
@@ -141,7 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 18),
                     TextField(
                       controller: _passCtrl,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: textColor,
                         fontWeight: FontWeight.w500,
@@ -152,6 +154,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintStyle: theme.textTheme.bodyLarge?.copyWith(
                           color: hintColor,
                           fontWeight: FontWeight.w500,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: accent,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
                         enabledBorder: border(accent.withOpacity(.85)),
                         focusedBorder: border(accent),
@@ -167,7 +182,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 18),
                     TextField(
                       controller: _confirmCtrl,
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: textColor,
                         fontWeight: FontWeight.w500,
@@ -178,6 +193,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintStyle: theme.textTheme.bodyLarge?.copyWith(
                           color: hintColor,
                           fontWeight: FontWeight.w500,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: accent,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                            });
+                          },
                         ),
                         errorText: _confirmError,
                         enabledBorder: border(accent.withOpacity(.85)),

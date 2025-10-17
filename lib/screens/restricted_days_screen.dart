@@ -258,9 +258,11 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                         const SizedBox(height: 8),
                         Text(
                           'Grouped by lunar whispers of each month.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: (colors?.textOnLight ?? AppColors.indigoDeep)
-                                .withOpacity(0.7),
+                                .withOpacity(0.85),
                           ),
                         ),
                         const SizedBox(height: 20),

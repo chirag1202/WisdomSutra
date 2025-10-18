@@ -18,8 +18,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "stable"
-
+          flutter-version: '3.35.5' 
+          channel: 'stable'
+          
       - name: Install Android SDK components (NDK + build-tools)
         run: |
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" >/dev/null || true

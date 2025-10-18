@@ -26,6 +26,17 @@ jobs:
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" >/dev/null || true
           $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platforms;android-33" "build-tools;33.0.2" "ndk;23.1.7779620" "cmake;3.10.2.4988404"
 
+      - name: Expose NDK llvm-strip on PATH
+        run: |
+        # adjust ndk version if your sdkmanager installed a different one
+          export NDK_VER="23.1.7779620"
+          export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
+          export ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/$NDK_VER"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+          ls -l "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" || true
+
+
       - name: Restore pub cache
         uses: actions/cache@v4
         with:

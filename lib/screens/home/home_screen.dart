@@ -58,6 +58,13 @@ class HomeScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 40),
+                          GoldenButton(
+                            label: 'Ask a Question',
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/questions');
+                            },
+                          ),
+                          const SizedBox(height: 32),
                           _buildFeatureCard(
                             context,
                             icon: Icons.menu_book_rounded,
@@ -87,14 +94,7 @@ class HomeScreen extends StatelessWidget {
                             colors: colors,
                             theme: theme,
                           ),
-                          const SizedBox(height: 40),
                           const Spacer(),
-                          GoldenButton(
-                            label: 'Ask a Question',
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/questions');
-                            },
-                          ),
                           const SizedBox(height: 20),
                         ],
                       ),

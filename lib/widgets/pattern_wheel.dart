@@ -54,8 +54,15 @@ class _PatternWheelState extends State<PatternWheel> {
   void didUpdateWidget(covariant PatternWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value && _controller.hasClients) {
+      final isFirstTouchTransition =
+          oldWidget.isTouched == false && widget.isTouched == true;
+      if (isFirstTouchTransition) {
+        return;
+      }
       final target = (widget.value.clamp(1, kItems)) - 1;
-      _controller.jumpToItem(target);
+      if (_controller.selectedItem != target) {
+        _controller.jumpToItem(target);
+      }
     }
   }
 

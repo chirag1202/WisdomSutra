@@ -24,7 +24,7 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
     // Avoid setState for value updates so the whole screen doesn't rebuild on every tick.
     // We only need the latest values when user taps "Reveal Answer".
     values[idx] = val;
-    
+
     // Mark this roller as touched
     if (touchedRollers.add(idx)) {
       // Defer setState to avoid interrupting smooth scrolling on first touch
@@ -111,6 +111,20 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
               ),
             ),
             const SizedBox(height: 8),
+            if (!allRollersTouched)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  'You can reveal the answer only once all four rollers are swiped at least once.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color:
+                        (colors?.textOnDark ?? Colors.white).withOpacity(0.85),
+                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),

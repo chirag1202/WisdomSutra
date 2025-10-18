@@ -35,6 +35,18 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
           restore-keys: ${{ runner.os }}-pub-
 
+      - name: Ensure JDK and remove bad org.gradle.java.home
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Remove org.gradle.java.home if present (CI-safe)
+        run: |
+        sed -i '/org.gradle.java.home/d' gradle.properties || true
+        sed -i '/org.gradle.java.home/d' android/gradle.properties || true
+        sed -i '/org.gradle.java.home/d' android/local.properties || true
+
       - name: Get dependencies
         run: flutter pub get
 

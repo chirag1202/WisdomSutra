@@ -73,7 +73,8 @@ class _PatternWheelState extends State<PatternWheel> {
         ? accent.withAlpha((255 * .85).round())
         : Colors.redAccent;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
       width: 72,
       height: 200,
       decoration: BoxDecoration(

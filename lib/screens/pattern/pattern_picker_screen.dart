@@ -21,6 +21,10 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
   final Set<int> touchedRollers = {};
 
   void _onChanged(int idx, int val) {
+    // Avoid setState for value updates so the whole screen doesn't rebuild on every tick.
+    // We only need the latest values when user taps "Reveal Answer".
+    values[idx] = val;
+    
     // Mark this roller as touched
     if (touchedRollers.add(idx)) {
       // Defer setState to avoid interrupting smooth scrolling on first touch
@@ -30,9 +34,6 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
         }
       });
     }
-    // Avoid setState for value updates so the whole screen doesn't rebuild on every tick.
-    // We only need the latest values when user taps "Reveal Answer".
-    values[idx] = val;
   }
 
   bool get allRollersTouched => touchedRollers.length == 4;

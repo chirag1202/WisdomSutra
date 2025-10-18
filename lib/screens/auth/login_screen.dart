@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passCtrl = TextEditingController();
   String? _emailError;
   bool _loading = false;
+  bool _obscurePassword = true;
 
   final _auth = const AuthService();
 
@@ -176,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 18),
                     TextField(
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       controller: _passCtrl,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: textColor,
@@ -189,7 +190,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: hintColor,
                           fontWeight: FontWeight.w500,
                         ),
-                        suffixIcon: Icon(Icons.visibility, color: accent),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: accent,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                         enabledBorder: border(accent.withOpacity(.85)),
                         focusedBorder: border(accent),
                         errorBorder: border(Colors.redAccent),

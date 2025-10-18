@@ -17,12 +17,26 @@ class PatternPickerScreen extends StatefulWidget {
 class _PatternPickerScreenState extends State<PatternPickerScreen> {
   // Start at 1 to align with 1..120 wheels
   final List<int> values = [1, 1, 1, 1];
+  // Track which rollers have been touched at least once
+  final Set<int> touchedRollers = {};
 
   void _onChanged(int idx, int val) {
-    // Avoid setState here so the whole screen doesn't rebuild on every tick.
+    // Avoid setState for value updates so the whole screen doesn't rebuild on every tick.
     // We only need the latest values when user taps "Reveal Answer".
     values[idx] = val;
+
+    // Mark this roller as touched
+    if (touchedRollers.add(idx)) {
+      // Defer setState to avoid interrupting smooth scrolling on first touch
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
   }
+
+  bool get allRollersTouched => touchedRollers.length == 4;
 
   String get patternString =>
       values.map((v) => v % 2 == 0 ? '2' : '1').join(' • ');
@@ -59,9 +73,11 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
               child: Text(
                 'Swipe the rollers smoothly. They’ll settle naturally.',
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                     color:
-                        (colors?.textOnDark ?? Colors.white).withOpacity(.9)),
+                        (colors?.textOnDark ?? Colors.white).withOpacity(.95)),
               ),
             ),
             const SizedBox(height: 30),
@@ -87,27 +103,48 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
                 children: List.generate(
                     4,
                     (i) => PatternWheel(
-                        index: i, value: values[i], onChanged: _onChanged)),
+                          index: i,
+                          value: values[i],
+                          onChanged: _onChanged,
+                          isTouched: touchedRollers.contains(i),
+                        )),
               ),
             ),
             const SizedBox(height: 8),
+            if (!allRollersTouched)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  'You can reveal the answer only once all four rollers are swiped at least once.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color:
+                        (colors?.textOnDark ?? Colors.white).withOpacity(0.85),
+                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),
               child: GoldenButton(
                 label: 'Reveal Answer',
-                onPressed: () => Navigator.pushNamed(
-                  context,
-                  '/viewAnswer',
-                  arguments: {
-                    'pattern': patternKey,
-                    'string': patternString,
-                    if (widget.question != null) 'question': widget.question,
-                    if (widget.questionId != null)
-                      'questionId': widget.questionId,
-                    // question id unknown here; let QuestionsScreen pass it when navigating to PatternPicker
-                  },
-                ),
+                onPressed: allRollersTouched
+                    ? () => Navigator.pushNamed(
+                          context,
+                          '/viewAnswer',
+                          arguments: {
+                            'pattern': patternKey,
+                            'string': patternString,
+                            if (widget.question != null)
+                              'question': widget.question,
+                            if (widget.questionId != null)
+                              'questionId': widget.questionId,
+                            // question id unknown here; let QuestionsScreen pass it when navigating to PatternPicker
+                          },
+                        )
+                    : null,
               ),
             )
           ],

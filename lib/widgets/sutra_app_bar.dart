@@ -75,7 +75,7 @@ class SutraAppBar extends StatelessWidget implements PreferredSizeWidget {
             tooltip: 'Home',
             icon: Icon(Icons.home_rounded, color: iconColor),
             onPressed: () => Navigator.of(context)
-                .pushNamedAndRemoveUntil('/questions', (r) => false),
+                .pushNamedAndRemoveUntil('/home', (r) => false),
           ),
         if (showLogout)
           IconButton(

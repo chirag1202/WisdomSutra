@@ -102,8 +102,7 @@ class QuestionsScreen extends StatelessWidget {
                                             '/patternPicker',
                                             arguments: {
                                               'question': q.text,
-                                              if (q.id != null)
-                                                'questionId': q.id,
+                                              'questionId': q.id,
                                             },
                                           );
                                         },
@@ -143,8 +142,7 @@ class QuestionsScreen extends StatelessWidget {
                                           '/patternPicker',
                                           arguments: {
                                             'question': q.text,
-                                            if (q.id != null)
-                                              'questionId': q.id,
+                                            'questionId': q.id,
                                           },
                                         );
                                       },

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
+import '../constants/theme.dart';
 
 typedef PatternChanged = void Function(int index, int value);
 
@@ -8,11 +9,13 @@ class PatternWheel extends StatefulWidget {
   final int index;
   final int value;
   final PatternChanged onChanged;
+  final bool isTouched;
   const PatternWheel(
       {super.key,
       required this.index,
       required this.value,
-      required this.onChanged});
+      required this.onChanged,
+      this.isTouched = false});
 
   @override
   State<PatternWheel> createState() => _PatternWheelState();
@@ -51,8 +54,15 @@ class _PatternWheelState extends State<PatternWheel> {
   void didUpdateWidget(covariant PatternWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value && _controller.hasClients) {
+      final isFirstTouchTransition =
+          oldWidget.isTouched == false && widget.isTouched == true;
+      if (isFirstTouchTransition) {
+        return;
+      }
       final target = (widget.value.clamp(1, kItems)) - 1;
-      _controller.jumpToItem(target);
+      if (_controller.selectedItem != target) {
+        _controller.jumpToItem(target);
+      }
     }
   }
 
@@ -64,12 +74,23 @@ class _PatternWheelState extends State<PatternWheel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final colors = Theme.of(context).extension<SutraColors>();
+    final accent = colors?.accent ?? AppColors.gold;
+    final borderColor = widget.isTouched
+        ? accent.withAlpha((255 * .85).round())
+        : Colors.redAccent;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
       width: 72,
       height: 200,
       decoration: BoxDecoration(
         color: AppColors.parchment,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: borderColor,
+          width: widget.isTouched ? 1.6 : 2.6,
+        ),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withAlpha((255 * .28).round()),

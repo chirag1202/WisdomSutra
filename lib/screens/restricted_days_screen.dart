@@ -88,8 +88,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
     }
   }
 
-  void _proceedToQuestions() {
-    Navigator.pushReplacementNamed(context, '/questions');
+  void _goToHome() {
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   Widget _buildShimmerText(String text, TextStyle style, SutraColors? colors) {
@@ -258,9 +258,11 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                         const SizedBox(height: 8),
                         Text(
                           'Grouped by lunar whispers of each month.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: (colors?.textOnLight ?? AppColors.indigoDeep)
-                                .withOpacity(0.7),
+                                .withOpacity(0.85),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -351,8 +353,8 @@ class _RestrictedDaysScreenState extends State<RestrictedDaysScreen>
                 const SizedBox(height: 24),
                 if (!_isRestricted)
                   GoldenButton(
-                    label: 'Proceed',
-                    onPressed: _proceedToQuestions,
+                    label: 'Continue',
+                    onPressed: _goToHome,
                   ),
               ],
             ),

@@ -45,6 +45,10 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
+
+    packagingOptions {
+        doNotStrip "**/*.so"
+    }
 }
 
 flutter {

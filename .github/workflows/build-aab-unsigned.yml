@@ -61,6 +61,20 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Debug NDK / strip tool on runner
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "Listing SDK root:"
+          ls -la /usr/local/lib/android/sdk || true
+          echo "Listing ndk directory:"
+          ls -la /usr/local/lib/android/sdk/ndk || true
+          echo "Listing toolchains folders:"
+          ls -la /usr/local/lib/android/sdk/ndk/*/toolchains/llvm/prebuilt || true
+          echo "Listing llvm-strip if present:"
+          ls -la /usr/local/lib/android/sdk/ndk/*/toolchains/llvm/prebuilt/*/bin/llvm-strip || true
+          echo "Which strip binaries exist:"
+          find /usr/local/lib/android/sdk -type f -name 'llvm-strip' -o -name 'strip' -printf '%p\n' || true
+
       - name: Build unsigned app bundle (AAB)
         run: |
           flutter build appbundle --release \

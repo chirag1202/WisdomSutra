@@ -28,7 +28,7 @@ jobs:
 
       - name: Expose NDK llvm-strip on PATH
         run: |
-        # adjust ndk version if your sdkmanager installed a different one
+          # adjust ndk version if your sdkmanager installed a different one
           export NDK_VER="23.1.7779620"
           export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
           export ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/$NDK_VER"

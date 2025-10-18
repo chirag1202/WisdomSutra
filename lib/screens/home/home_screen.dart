@@ -87,6 +87,7 @@ class HomeScreen extends StatelessWidget {
                             colors: colors,
                             theme: theme,
                           ),
+                          const SizedBox(height: 40),
                           const Spacer(),
                           GoldenButton(
                             label: 'Ask a Question',

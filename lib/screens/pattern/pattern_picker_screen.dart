@@ -21,13 +21,19 @@ class _PatternPickerScreenState extends State<PatternPickerScreen> {
   final Set<int> touchedRollers = {};
 
   void _onChanged(int idx, int val) {
-    // Mark this roller as touched
-    if (touchedRollers.add(idx)) {
-      setState(() {});
-    }
     // Avoid setState for value updates so the whole screen doesn't rebuild on every tick.
     // We only need the latest values when user taps "Reveal Answer".
     values[idx] = val;
+    
+    // Mark this roller as touched
+    if (touchedRollers.add(idx)) {
+      // Defer setState to avoid interrupting smooth scrolling on first touch
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
   }
 
   bool get allRollersTouched => touchedRollers.length == 4;

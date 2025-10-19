@@ -18,9 +18,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.5' 
+          flutter-version: '3.35.5'
           channel: 'stable'
-          
+
       - name: Install Android SDK components (NDK + build-tools)
         run: |
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" >/dev/null || true
@@ -35,7 +35,6 @@ jobs:
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
           echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
           ls -l "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" || true
-
 
       - name: Restore pub cache
         uses: actions/cache@v4
@@ -61,26 +60,52 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Debug NDK / strip tool on runner
+      - name: Debug native libs & llvm-strip (temporary)
         run: |
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo "Listing SDK root:"
+          echo "==== SDK Root ===="
           ls -la /usr/local/lib/android/sdk || true
-          echo "Listing ndk directory:"
+
+          echo "==== NDK dirs ===="
           ls -la /usr/local/lib/android/sdk/ndk || true
-          echo "Listing toolchains folders:"
+
+          echo "==== Toolchains (llvm) ===="
           ls -la /usr/local/lib/android/sdk/ndk/*/toolchains/llvm/prebuilt || true
-          echo "Listing llvm-strip if present:"
-          ls -la /usr/local/lib/android/sdk/ndk/*/toolchains/llvm/prebuilt/*/bin/llvm-strip || true
-          echo "Which strip binaries exist:"
-          find /usr/local/lib/android/sdk -type f -name 'llvm-strip' -o -name 'strip' -printf '%p\n' || true
+
+          echo "==== llvm-strip binary (if present) ===="
+          for p in /usr/local/lib/android/sdk/ndk/*/toolchains/llvm/prebuilt/*/bin/llvm-strip; do
+            if [ -f "$p" ]; then
+              echo "FOUND: $p"
+              ls -l "$p"
+            fi
+          done || true
+
+          echo "==== List .so files inside android directory (first 200) ===="
+          find android -type f -name "*.so" -print | head -n 200 || true
+
+          echo "==== List .so files under build outputs (if any) ===="
+          find build -type f -name "*.so" -print | head -n 200 || true
+
+          echo "==== List .so files in pub cache/plugins (if any) ===="
+          find ~/.pub-cache -type f -name "*.so" -print | head -n 200 || true
+
+          echo "==== Show file sizes for common lib folders in android/app/src/main/jniLibs and android/app/libs ===="
+          if [ -d "android/app/src/main/jniLibs" ]; then
+            du -ah android/app/src/main/jniLibs | sort -hr | head -n 50 || true
+          fi
+          if [ -d "android/app/libs" ]; then
+            du -ah android/app/libs | sort -hr | head -n 50 || true
+          fi
+
+          echo "==== Which strip binaries exist on PATH ===="
+          which llvm-strip || which strip || true
+          echo "==== End debug listing ===="
 
       - name: Build unsigned app bundle (AAB)
         run: |
           flutter build appbundle --release \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
             --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
-      
+
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:

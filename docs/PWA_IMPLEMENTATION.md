@@ -107,16 +107,28 @@ PWA features require HTTPS in production (except localhost for testing).
 
 ### Cache Versioning
 When updating the app:
-1. Increment `CACHE_NAME` in `flutter_service_worker.js` (or automate with timestamp/commit hash in CI/CD)
+1. Update cache version using the provided script (automates with timestamp/commit hash in CI/CD):
+   ```bash
+   ./scripts/update-cache-version.sh
+   ```
 2. Rebuild the Flutter app
 3. Deploy - old caches will be automatically cleaned up
 4. Service worker uses `skipWaiting()` and `clients.claim()` to update automatically
 
-**Automated Versioning Example** (for CI/CD):
+**Automated Versioning**:
+The `scripts/update-cache-version.sh` script handles cache version updates automatically:
+- Uses git commit hash if available
+- Falls back to timestamp if not in git repository
+- Supports custom version strings
+- Automatically updates the service worker file
+
+Example usage:
 ```bash
-# Use timestamp for cache version
-CACHE_VERSION="wisdomsutra-cache-$(date +%Y%m%d%H%M%S)"
-sed -i "s/wisdomsutra-cache-v1/$CACHE_VERSION/" web/flutter_service_worker.js
+# Automatic versioning (uses git hash or timestamp)
+./scripts/update-cache-version.sh
+
+# Custom version
+./scripts/update-cache-version.sh "v2.0.0"
 ```
 
 ### Asset Caching

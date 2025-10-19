@@ -113,12 +113,15 @@ The service worker implements a cache-first strategy:
 - Current cache: `wisdomsutra-cache-v1`
 - Flutter cache: `flutter-app-cache` (separate)
 - Update process: Increment version number to force cache refresh
-- **Best Practice**: Automate cache versioning in CI/CD pipeline using build timestamp or commit hash:
+- **Best Practice**: Automate cache versioning in CI/CD pipeline using the provided script:
   ```bash
-  # Example: Use timestamp for cache version
-  CACHE_VERSION="wisdomsutra-cache-$(date +%Y%m%d%H%M%S)"
-  sed -i "s/wisdomsutra-cache-v1/$CACHE_VERSION/" web/flutter_service_worker.js
+  # Update cache version automatically (uses git commit hash if available, timestamp otherwise)
+  ./scripts/update-cache-version.sh
+  
+  # Or specify a custom version
+  ./scripts/update-cache-version.sh "v2.0.0"
   ```
+  See `scripts/update-cache-version.sh` for details.
 
 ## Testing & Validation
 

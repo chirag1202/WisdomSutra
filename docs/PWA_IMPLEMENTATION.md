@@ -44,9 +44,9 @@ Cached Resources:
 ## Testing PWA Features
 
 ### Local Testing
-1. Build the Flutter web app:
+1. Build the Flutter web app with HTML renderer for better PWA compatibility:
    ```bash
-   flutter build web
+   flutter build web --web-renderer html
    ```
 
 2. Serve the built app locally:
@@ -107,9 +107,17 @@ PWA features require HTTPS in production (except localhost for testing).
 
 ### Cache Versioning
 When updating the app:
-1. Increment `CACHE_NAME` in `flutter_service_worker.js`
+1. Increment `CACHE_NAME` in `flutter_service_worker.js` (or automate with timestamp/commit hash in CI/CD)
 2. Rebuild the Flutter app
 3. Deploy - old caches will be automatically cleaned up
+4. Service worker uses `skipWaiting()` and `clients.claim()` to update automatically
+
+**Automated Versioning Example** (for CI/CD):
+```bash
+# Use timestamp for cache version
+CACHE_VERSION="wisdomsutra-cache-$(date +%Y%m%d%H%M%S)"
+sed -i "s/wisdomsutra-cache-v1/$CACHE_VERSION/" web/flutter_service_worker.js
+```
 
 ### Asset Caching
 Flutter's build process generates optimized assets. The service worker caches the app shell, while Flutter handles caching of its compiled code.

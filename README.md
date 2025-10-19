@@ -77,6 +77,7 @@ WisdomSutra is a mystical guidance Flutter application that provides wisdom and 
    
    # Web (with PWA support)
    flutter build web --release \
+                     --web-renderer html \
                      --dart-define=SUPABASE_URL=your_url \
                      --dart-define=SUPABASE_ANON_KEY=your_key
    ```

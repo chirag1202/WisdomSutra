@@ -113,6 +113,12 @@ The service worker implements a cache-first strategy:
 - Current cache: `wisdomsutra-cache-v1`
 - Flutter cache: `flutter-app-cache` (separate)
 - Update process: Increment version number to force cache refresh
+- **Best Practice**: Automate cache versioning in CI/CD pipeline using build timestamp or commit hash:
+  ```bash
+  # Example: Use timestamp for cache version
+  CACHE_VERSION="wisdomsutra-cache-$(date +%Y%m%d%H%M%S)"
+  sed -i "s/wisdomsutra-cache-v1/$CACHE_VERSION/" web/flutter_service_worker.js
+  ```
 
 ## Testing & Validation
 
@@ -166,7 +172,10 @@ Test results:
 5. **Analytics**: Consider adding PWA install tracking
 
 ### Recommended Deployment Steps
-1. Build the Flutter web app
+1. Build the Flutter web app with HTML renderer for better PWA compatibility:
+   ```bash
+   flutter build web --release --web-renderer html
+   ```
 2. Verify PWA features with validation script
 3. Test locally with HTTPS (or use testing tools)
 4. Deploy to hosting service with HTTPS
@@ -196,7 +205,7 @@ Test results:
 2. **Firefox**: No install prompt (manual Add to Home Screen only)
 3. **Initial Load**: First load requires network (after that works offline)
 4. **Storage**: Cache storage limits vary by browser
-5. **Updates**: Users must reload to get service worker updates
+5. **Updates**: Service worker automatically updates in background using `skipWaiting()` and `clients.claim()`. New version activates on next page load or refresh.
 
 ## Maintenance
 

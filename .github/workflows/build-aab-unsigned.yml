@@ -100,6 +100,27 @@ jobs:
           which llvm-strip || which strip || true
           echo "==== End debug listing ===="
 
+      - name: Ensure latest NDK llvm-strip is on PATH
+        run: |
+          set -e
+          SDK_ROOT=/usr/local/lib/android/sdk
+          echo "SDK_ROOT=$SDK_ROOT"
+          # pick the newest installed NDK folder (numeric sort)
+          NDK_DIR_NAME=$(ls -1 $SDK_ROOT/ndk | sort -V | tail -n1)
+          export ANDROID_NDK_HOME="$SDK_ROOT/ndk/$NDK_DIR_NAME"
+          echo "Detected NDK: $ANDROID_NDK_HOME"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
+          TOOLCHAIN_BIN="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          if [ -d "$TOOLCHAIN_BIN" ]; then
+            echo "$TOOLCHAIN_BIN" >> $GITHUB_PATH
+            echo "Added $TOOLCHAIN_BIN to PATH"
+            ls -la "$TOOLCHAIN_BIN" | sed -n '1,120p'
+          else
+            echo "ERROR: expected toolchain bin not found: $TOOLCHAIN_BIN" >&2
+            ls -la "$SDK_ROOT/ndk" || true
+            exit 1
+          fi
+      
       - name: Build unsigned app bundle (AAB)
         run: |
           flutter build appbundle --release \

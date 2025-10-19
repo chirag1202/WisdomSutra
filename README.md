@@ -13,6 +13,7 @@ WisdomSutra is a mystical guidance Flutter application that provides wisdom and 
 - **User Authentication**: Secure login and signup via Supabase
 - **Answer Reveal**: Animated answer cards based on generated patterns
 - **Theme Variants**: Multiple color themes including Classic, Emerald Dawn, Crimson Lotus, and Night Sapphire
+- **Progressive Web App (PWA)**: Installable on devices with offline support and native app-like experience
 
 ### Technology Stack
 - **Framework**: Flutter (SDK >=3.0.0)
@@ -73,7 +74,30 @@ WisdomSutra is a mystical guidance Flutter application that provides wisdom and 
    flutter build ios --release \
                      --dart-define=SUPABASE_URL=your_url \
                      --dart-define=SUPABASE_ANON_KEY=your_key
+   
+   # Web (with PWA support)
+   flutter build web --release \
+                     --dart-define=SUPABASE_URL=your_url \
+                     --dart-define=SUPABASE_ANON_KEY=your_key
    ```
+
+### PWA Support
+WisdomSutra includes full Progressive Web App support for the web version:
+- **Offline Support**: Works without internet connection using service workers
+- **Installable**: Can be installed on devices like a native app
+- **App-like Experience**: Runs in standalone mode without browser UI
+- **Automatic Updates**: Service worker handles caching and updates
+
+To test PWA features locally:
+```bash
+flutter build web
+cd build/web
+python3 -m http.server 8000
+# Visit http://localhost:8000 and check PWA features
+# Use pwa-test.html for comprehensive PWA testing
+```
+
+For detailed PWA documentation, see [docs/PWA_IMPLEMENTATION.md](docs/PWA_IMPLEMENTATION.md).
 
 ### Running Tests
 ```bash

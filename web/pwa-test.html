@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WisdomSutra PWA Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    h1 {
+      color: #2B1B6B;
+      border-bottom: 3px solid #D4A017;
+      padding-bottom: 10px;
+    }
+    
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .pass {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .fail {
+      background: #f44336;
+      color: white;
+    }
+    
+    .pending {
+      background: #FF9800;
+      color: white;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #D4A017 0%, #B98611 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    pre {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    .info {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔮 WisdomSutra PWA Test Suite</h1>
+  
+  <div class="info">
+    <strong>Note:</strong> This test page helps validate PWA features. Build the Flutter web app and serve it with a local server to test:
+    <pre>flutter build web && cd build/web && python3 -m http.server 8000</pre>
+  </div>
+  
+  <div class="test-section">
+    <h2>1. Manifest Test</h2>
+    <p>Check if manifest.json is properly loaded</p>
+    <div id="manifest-test">
+      <span class="status pending">Testing...</span>
+    </div>
+    <button onclick="testManifest()">Test Manifest</button>
+    <div id="manifest-details"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>2. Service Worker Test</h2>
+    <p>Check if service worker is registered and active</p>
+    <div id="sw-test">
+      <span class="status pending">Testing...</span>
+    </div>
+    <button onclick="testServiceWorker()">Test Service Worker</button>
+    <div id="sw-details"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>3. Cache Test</h2>
+    <p>Check if resources are being cached</p>
+    <div id="cache-test">
+      <span class="status pending">Testing...</span>
+    </div>
+    <button onclick="testCache()">Test Cache</button>
+    <div id="cache-details"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>4. Install Prompt Test</h2>
+    <p>Check if PWA can be installed</p>
+    <div id="install-test">
+      <span class="status pending">Waiting for prompt...</span>
+    </div>
+    <button id="install-btn" style="display:none;">Install App</button>
+    <div id="install-details"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>5. Offline Test</h2>
+    <p>Test offline functionality</p>
+    <div id="offline-test">
+      <span class="status pending">Testing...</span>
+    </div>
+    <button onclick="testOffline()">Check Offline Support</button>
+    <div id="offline-details"></div>
+  </div>
+
+  <script>
+    let deferredPrompt;
+
+    // Test Manifest
+    async function testManifest() {
+      const resultDiv = document.getElementById('manifest-test');
+      const detailsDiv = document.getElementById('manifest-details');
+      
+      try {
+        const response = await fetch('manifest.json');
+        const manifest = await response.json();
+        
+        resultDiv.innerHTML = '<span class="status pass">PASS</span>';
+        detailsDiv.innerHTML = `<pre>${JSON.stringify(manifest, null, 2)}</pre>`;
+        
+        // Validate required fields
+        const required = ['name', 'short_name', 'start_url', 'display', 'icons'];
+        const missing = required.filter(field => !manifest[field]);
+        
+        if (missing.length > 0) {
+          detailsDiv.innerHTML += `<p style="color: red;">Missing required fields: ${missing.join(', ')}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+        detailsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+      }
+    }
+
+    // Test Service Worker
+    async function testServiceWorker() {
+      const resultDiv = document.getElementById('sw-test');
+      const detailsDiv = document.getElementById('sw-details');
+      
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration();
+          
+          if (registration) {
+            resultDiv.innerHTML = '<span class="status pass">PASS</span>';
+            detailsDiv.innerHTML = `
+              <p><strong>State:</strong> ${registration.active ? 'Active' : 'Not Active'}</p>
+              <p><strong>Scope:</strong> ${registration.scope}</p>
+              <p><strong>Update:</strong> ${registration.updateViaCache}</p>
+            `;
+          } else {
+            resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+            detailsDiv.innerHTML = '<p style="color: red;">Service Worker not registered</p>';
+          }
+        } catch (error) {
+          resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+          detailsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+      } else {
+        resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+        detailsDiv.innerHTML = '<p style="color: red;">Service Workers not supported</p>';
+      }
+    }
+
+    // Test Cache
+    async function testCache() {
+      const resultDiv = document.getElementById('cache-test');
+      const detailsDiv = document.getElementById('cache-details');
+      
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          
+          if (cacheNames.length > 0) {
+            resultDiv.innerHTML = '<span class="status pass">PASS</span>';
+            
+            let details = '<p><strong>Cache Names:</strong></p><ul>';
+            for (const name of cacheNames) {
+              const cache = await caches.open(name);
+              const requests = await cache.keys();
+              details += `<li>${name} (${requests.length} items)</li>`;
+            }
+            details += '</ul>';
+            
+            detailsDiv.innerHTML = details;
+          } else {
+            resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+            detailsDiv.innerHTML = '<p style="color: red;">No caches found. Try reloading the page.</p>';
+          }
+        } catch (error) {
+          resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+          detailsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+      } else {
+        resultDiv.innerHTML = '<span class="status fail">FAIL</span>';
+        detailsDiv.innerHTML = '<p style="color: red;">Cache API not supported</p>';
+      }
+    }
+
+    // Test Offline
+    function testOffline() {
+      const resultDiv = document.getElementById('offline-test');
+      const detailsDiv = document.getElementById('offline-details');
+      
+      const isOnline = navigator.onLine;
+      
+      if (isOnline) {
+        resultDiv.innerHTML = '<span class="status pass">ONLINE</span>';
+        detailsDiv.innerHTML = `
+          <p>Currently online. To test offline:</p>
+          <ol>
+            <li>Open DevTools (F12)</li>
+            <li>Go to Network tab</li>
+            <li>Select "Offline" from throttling dropdown</li>
+            <li>Reload the page</li>
+          </ol>
+          <p>If service worker is working, the page should load from cache.</p>
+        `;
+      } else {
+        resultDiv.innerHTML = '<span class="status pass">OFFLINE</span>';
+        detailsDiv.innerHTML = '<p>App is offline. If you can see this, offline support is working!</p>';
+      }
+    }
+
+    // Install prompt handler
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      const resultDiv = document.getElementById('install-test');
+      const installBtn = document.getElementById('install-btn');
+      
+      resultDiv.innerHTML = '<span class="status pass">READY</span>';
+      installBtn.style.display = 'inline-block';
+      
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          
+          const detailsDiv = document.getElementById('install-details');
+          if (outcome === 'accepted') {
+            detailsDiv.innerHTML = '<p style="color: green;">✓ App installed successfully!</p>';
+          } else {
+            detailsDiv.innerHTML = '<p>Installation cancelled by user</p>';
+          }
+          
+          deferredPrompt = null;
+          installBtn.style.display = 'none';
+        }
+      });
+    });
+
+    // Auto-run tests on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        testManifest();
+        testServiceWorker();
+        testCache();
+        testOffline();
+      }, 1000);
+    });
+
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      console.log('Back online');
+      testOffline();
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('Gone offline');
+      testOffline();
+    });
+  </script>
+</body>
+</html>

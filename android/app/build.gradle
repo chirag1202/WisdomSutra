@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace "com.example.wisdom_sutra"
+    namespace "com.mindexplorers.wisdom_sutra"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.wisdom_sutra"
+        applicationId "com.mindexplorers.wisdom_sutra"
         minSdk flutter.minSdkVersion
         targetSdk flutter.targetSdkVersion
         versionCode flutter.versionCode

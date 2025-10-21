@@ -1,4 +1,4 @@
-package com.example.wisdom_sutra
+package com.mindexplorers.wisdom_sutra
 
 import io.flutter.embedding.android.FlutterActivity
 

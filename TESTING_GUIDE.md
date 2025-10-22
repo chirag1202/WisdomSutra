@@ -173,7 +173,7 @@ cat assets/data/answers.json | head -10
 #### First Time Experience
 ```bash
 # Option 1: Clear app data (Android)
-adb shell pm clear com.example.wisdom_sutra
+adb shell pm clear com.mindexplorers.wisdom_sutra
 
 # Option 2: Uninstall and reinstall
 flutter clean

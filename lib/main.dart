@@ -12,8 +12,17 @@ Future<void> main() async {
   final supabaseUrl = SUPABASE_URL.trim();
   final supabaseAnonKey = SUPABASE_ANON_KEY.trim();
 
-  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
-    runApp(const MissingSupabaseConfigApp());
+  if (supabaseUrl.isEmpty) {
+    runApp(const MissingSupabaseConfigApp(
+      missingField: 'SUPABASE_URL is missing or blank.',
+    ));
+    return;
+  }
+
+  if (supabaseAnonKey.isEmpty) {
+    runApp(const MissingSupabaseConfigApp(
+      missingField: 'SUPABASE_ANON_KEY is missing or blank.',
+    ));
     return;
   }
 
@@ -27,7 +36,12 @@ Future<void> main() async {
 }
 
 class MissingSupabaseConfigApp extends StatelessWidget {
-  const MissingSupabaseConfigApp({super.key});
+  const MissingSupabaseConfigApp({
+    super.key,
+    required this.missingField,
+  });
+
+  final String missingField;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +59,8 @@ class MissingSupabaseConfigApp extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
+                  children: [
+                    const Text(
                       'Supabase configuration missing',
                       style: TextStyle(
                         fontSize: 28,
@@ -54,8 +68,17 @@ class MissingSupabaseConfigApp extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
+                      missingField,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
                       'Provide SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define when running or building the app.',
                       style: TextStyle(
                         fontSize: 16,
@@ -63,8 +86,8 @@ class MissingSupabaseConfigApp extends StatelessWidget {
                         height: 1.4,
                       ),
                     ),
-                    SizedBox(height: 16),
-                    Text(
+                    const SizedBox(height: 16),
+                    const Text(
                       'Example:\nflutter run --dart-define=SUPABASE_URL=your_url --dart-define=SUPABASE_ANON_KEY=your_key',
                       style: TextStyle(
                         fontSize: 14,

@@ -1,71 +1,64 @@
-name: Build and Commit APK
+name: Build release APK
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-    
+      contents: read
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-      
-      - name: Set up Java
+
+      - name: Validate Supabase secrets
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Both SUPABASE_URL and SUPABASE_ANON_KEY secrets must be configured." >&2
+            exit 1
+          fi
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Set up Java (Temurin 17)
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: temurin
           java-version: '17'
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.6'
+          flutter-version: '3.35.5'
           channel: 'stable'
-      
+
+      - name: Restore pub cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: ${{ runner.os }}-pub-
+
       - name: Install dependencies
-        working-directory: ./mathmasters
         run: flutter pub get
-      
-      - name: Build APK
-        working-directory: ./mathmasters
-        run: flutter build apk --split-per-abi --release
-      
-      - name: Create releases directory
-        run: mkdir -p releases
-      
-      - name: Copy APK to releases
+
+      - name: Build split-per-abi release APKs
         run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          # Copy all split APKs with timestamp
-          for apk in mathmasters/build/app/outputs/flutter-apk/app-*-release.apk; do
-            if [ -f "$apk" ]; then
-              basename=$(basename "$apk" .apk)
-              cp "$apk" "releases/${basename}-${TIMESTAMP}.apk"
-              cp "$apk" "releases/${basename}-latest.apk"
-            fi
-          done
-          echo "APK_TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-      
-      - name: Configure Git
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-      
-      - name: Commit APK
-        run: |
-          git add releases/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "ci: add APK build from ${{ github.sha }} (${APK_TIMESTAMP})"
-            git push
-          fi
+          flutter build apk --split-per-abi --release \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wisdomsutra-apk-release
+          path: build/app/outputs/flutter-apk/app-*-release.apk
